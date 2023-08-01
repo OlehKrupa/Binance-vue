@@ -1,6 +1,6 @@
 import api from "./api"
 
-const resource = "/currency"
+const resource = "api/currency"
 
 export const allCurrencies = () => api.get(resource)
 
