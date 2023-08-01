@@ -14,9 +14,9 @@
                     <li class="nav-item">
                         <router-link :to="{ name: 'dashboard' }" class="nav-link">Dashboard</router-link>
                     </li>
-                    <!-- <li class="nav-item">
+                    <li class="nav-item">
                         <router-link :to="{ name: 'preferences' }" class="nav-link">Preferences</router-link>
-                    </li> -->
+                    </li> 
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <template v-if="!store.isLoggedIn">
@@ -31,7 +31,8 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" :class="toggleClass" @click.prevent="toggle" href="#"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ store.user.name }}
+                                {{ store.user.first_name }}
+                                {{ store.user.last_name}}
                             </a>
                             <ul class="dropdown-menu" :class="toggleClass">
                                 <li><a href="#" class="dropdown-item" @click.prevent="logout">Logout</a></li>
