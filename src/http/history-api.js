@@ -1,6 +1,6 @@
 import api from "./api"
 
-const resource = "/history"
+const resource = "api/history"
 
 export const allHistory = () => api.get(resource);
 
