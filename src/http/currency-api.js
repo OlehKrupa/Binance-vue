@@ -2,7 +2,9 @@ import api from "./api"
 
 const resource = "api/currency"
 
-export const allCurrencies = () => api.get(resource)
+//export const allCurrencies = () => api.get(resource)
+
+export const allCurrencies = () => api.get("api/table")
 
 //export const createCurrency = (data) => api.post(resource, data);
 
