@@ -3,33 +3,33 @@
     <table class="currency-table">
       <thead>
         <tr>
-          <th>#</th>
+          <th>Order</th>
           <th>Currency</th>
-          <th>Price</th>
-          <th>Trend</th>
+          <th @click="sort('last_price')">Price<span v-if="sortColumn === 'last_price'"> {{ sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="sort('trend')">Trend<span v-if="sortColumn === 'trend'"> {{ sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(currency, index) in currencies" :key="currency.id"
-          :class="{ 'highlighted': isPreferredCurrency(currency.id) }" @click="updateUserPreferences(currency.id)">
+        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency.id"
+          :class="{ 'highlighted': isPreferredCurrency(currencyData.currency.id) }"
+          @click="updateUserPreferences(currencyData.currency.id)">
           <td>{{ index + 1 }}</td>
           <td>
             <div class="currency-info">
-              <img :src="currency.image_url" alt="currency img" class="currency-image" />
+              <img :src="currencyData.currency.image_url" alt="currency img" class="currency-image" />
               <div class="currency-names">
-                <span >{{ currency.full_name }}</span>
-                <span class="short-name">{{ currency.name }}</span>
+                <span>{{ currencyData.currency.full_name }}</span>
+                <span class="short-name">{{ currencyData.currency.name }}</span>
               </div>
             </div>
           </td>
-          <td>{{ currency.price }}</td>
-          <td>{{ currency.trend }}</td>
+          <td>{{ formatNumber(currencyData.last_price) }}</td>
+          <td :style="{ color: currencyData.trend >= 0 ? 'green' : 'red' }">{{ formatNumber(currencyData.trend) }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
-
 
 <script>
 import { allCurrencies } from '../http/currency-api';
@@ -38,8 +38,10 @@ import { userPreferences, userPreferencesUpdate } from '../http/user-api';
 export default {
   data() {
     return {
-      currencies: [],
+      currenciesData: [],
       preferences: [],
+      sortColumn: 'order',
+      sortDirection: 'asc',
     };
   },
 
@@ -48,13 +50,28 @@ export default {
     await this.fetchPreferences();
   },
 
+  computed: {
+    sortedCurrenciesData() {
+      return this.currenciesData.slice().sort((a, b) => {
+        const aValue = a[this.sortColumn];
+        const bValue = b[this.sortColumn];
+
+        if (typeof aValue === 'string') {
+          return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+        } else {
+          return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+        }
+      });
+    },
+  },
+
   methods: {
     async fetchCurrencies() {
       try {
         const response = await allCurrencies();
-        this.currencies = response.data;
+        this.currenciesData = response.data;
       } catch (error) {
-        console.error('Ошибка', error);
+        console.error('Error', error);
       }
     },
 
@@ -63,7 +80,7 @@ export default {
         const response = await userPreferences();
         this.preferences = response.data;
       } catch (error) {
-        console.error('Ошибка', error);
+        console.error('Error', error);
       }
     },
 
@@ -80,15 +97,30 @@ export default {
         }
         const selectedCurrencies = this.preferences;
         await userPreferencesUpdate({ selectedCurrencies });
-
       } catch (error) {
-        console.error('Ошибка', error);
+        console.error('Error', error);
+      }
+    },
+
+    formatNumber(value) {
+      if (Number.isFinite(value)) {
+        return value.toFixed(2);
+      } else {
+        return '';
+      }
+    },
+
+    sort(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
       }
     },
   },
 };
 </script>
-
 
 <style>
 .table-container {
@@ -105,6 +137,7 @@ export default {
 .currency-table td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  cursor: pointer; /* Add cursor pointer on column headers */
 }
 
 .currency-table th {
