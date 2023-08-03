@@ -3,28 +3,32 @@
     <table class="currency-table">
       <thead>
         <tr>
-          <th>Order</th>
-          <th>Currency</th>
-          <th @click="sort('last_price')">Price<span v-if="sortColumn === 'last_price'"> {{ sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
-          <th @click="sort('trend')">Trend<span v-if="sortColumn === 'trend'"> {{ sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+          <th class="order-header">Order</th>
+          <th @click="sort('currency_name')">Currency<span v-if="isColumnSorted('currency_name')"> {{
+            getSortDirection('currency_name') }}</span></th>
+          <th @click="sort('last_sell_price')">Price<span v-if="isColumnSorted('last_sell_price')"> {{
+            getSortDirection('last_sell_price') }}</span></th>
+          <th @click="sort('price_change_percent')">Rate<span v-if="isColumnSorted('price_change_percent')"> {{
+            getSortDirection('price_change_percent') }}</span></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency.id"
-          :class="{ 'highlighted': isPreferredCurrency(currencyData.currency.id) }"
-          @click="updateUserPreferences(currencyData.currency.id)">
+        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency_id"
+          :class="{ 'highlighted': isPreferredCurrency(currencyData.currency_id) }"
+          @click="updateUserPreferences(currencyData.currency_id)">
           <td>{{ index + 1 }}</td>
           <td>
             <div class="currency-info">
-              <img :src="currencyData.currency.image_url" alt="currency img" class="currency-image" />
+              <img :src="currencyData.image_url" alt="currency img" class="currency-image" />
               <div class="currency-names">
-                <span>{{ currencyData.currency.full_name }}</span>
-                <span class="short-name">{{ currencyData.currency.name }}</span>
+                <span>{{ currencyData.full_name }}</span>
+                <span class="short-name">{{ currencyData.currency_name }}</span>
               </div>
             </div>
           </td>
-          <td>{{ formatNumber(currencyData.last_price) }}</td>
-          <td :style="{ color: currencyData.trend >= 0 ? 'green' : 'red' }">{{ formatNumber(currencyData.trend) }}</td>
+          <td>{{ currencyData.last_sell_price }}</td>
+          <td :style="{ color: currencyData.price_change_percent >= 0 ? 'green' : 'red' }">{{
+            currencyData.price_change_percent }}</td>
         </tr>
       </tbody>
     </table>
@@ -40,8 +44,8 @@ export default {
     return {
       currenciesData: [],
       preferences: [],
-      sortColumn: 'order',
-      sortDirection: 'asc',
+      sortedColumn: 'orderIndex', // New data property to track the currently sorted column
+      sortDirection: 'asc', // New data property to track the sorting direction
     };
   },
 
@@ -52,16 +56,23 @@ export default {
 
   computed: {
     sortedCurrenciesData() {
-      return this.currenciesData.slice().sort((a, b) => {
-        const aValue = a[this.sortColumn];
-        const bValue = b[this.sortColumn];
+      let sortedData = this.currenciesData.slice();
 
-        if (typeof aValue === 'string') {
-          return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
-        } else {
+      sortedData = sortedData.sort((a, b) => {
+        const aValue = a[this.sortedColumn];
+        const bValue = b[this.sortedColumn];
+
+        if (this.sortedColumn === 'orderIndex') {
+          // Sort the "orderIndex" numerically
           return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+        } else if (this.sortedColumn === 'last_sell_price' || this.sortedColumn === 'price_change_percent') {
+          return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+        } else {
+          return aValue.toString().localeCompare(bValue.toString()) * (this.sortDirection === 'asc' ? 1 : -1);
         }
       });
+
+      return sortedData;
     },
   },
 
@@ -69,7 +80,12 @@ export default {
     async fetchCurrencies() {
       try {
         const response = await allCurrencies();
-        this.currenciesData = response.data;
+        this.currenciesData = response.data.map((currencyData, index) => ({
+          ...currencyData,
+          orderIndex: index,
+          last_sell_price: parseFloat(currencyData.last_sell_price),
+          price_change_percent: parseFloat(currencyData.price_change_percent).toString(),
+        }));
       } catch (error) {
         console.error('Error', error);
       }
@@ -82,6 +98,14 @@ export default {
       } catch (error) {
         console.error('Error', error);
       }
+    },
+
+    isColumnSorted(column) {
+      return this.sortedColumn === column;
+    },
+
+    getSortDirection(column) {
+      return this.sortedColumn === column ? (this.sortDirection === 'asc' ? '▲' : '▼') : '';
     },
 
     isPreferredCurrency(currencyId) {
@@ -102,19 +126,11 @@ export default {
       }
     },
 
-    formatNumber(value) {
-      if (Number.isFinite(value)) {
-        return value.toFixed(2);
-      } else {
-        return '';
-      }
-    },
-
     sort(column) {
-      if (this.sortColumn === column) {
+      if (this.sortedColumn === column) {
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
       } else {
-        this.sortColumn = column;
+        this.sortedColumn = column;
         this.sortDirection = 'asc';
       }
     },
@@ -137,7 +153,12 @@ export default {
 .currency-table td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  cursor: pointer; /* Add cursor pointer on column headers */
+  cursor: pointer;
+  /* Add cursor pointer on sortable column headers */
+}
+
+.currency-table th.order-header {
+  cursor: default; /* Set the cursor to default for the "Order" column header */
 }
 
 .currency-table th {

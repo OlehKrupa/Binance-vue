@@ -3,29 +3,32 @@
     <table class="currency-table">
       <thead>
         <tr>
-          <th>Order</th>
-          <th>Currency</th>
-          <th @click="sort('last_price')">Price<span v-if="sortColumn === 'last_price'"> {{ sortDirection === 'asc' ? '▲'
-            : '▼' }}</span></th>
-          <th @click="sort('trend')">Trend<span v-if="sortColumn === 'trend'"> {{ sortDirection === 'asc' ? '▲' : '▼'
-          }}</span></th>
+          <th class="order-header">Order</th>
+          <th @click="sort('currency_name')">Currency<span v-if="sortColumn === 'currency_name'"> {{
+            sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="sort('last_sell_price')">Price<span v-if="sortColumn === 'last_sell_price'"> {{ sortDirection ===
+            'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="sort('price_change_percent')">Rate<span v-if="sortColumn === 'price_change_percent'"> {{
+            sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency.id"
-          :class="{ 'highlighted': isSelected(currencyData.currency.id) }" @click="selectRow(currencyData.currency.id)">
+        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency_id"
+          :class="{ 'highlighted': isSelected(currencyData.currency_id), 'selected': selectedCurrencyId === currencyData.currency_id }"
+          @click="selectRow(currencyData.currency_id)">
           <td>{{ index + 1 }}</td>
           <td>
             <div class="currency-info">
-              <img :src="currencyData.currency.image_url" alt="currency img" class="currency-image" />
+              <img :src="currencyData.image_url" alt="currency img" class="currency-image" />
               <div class="currency-names">
-                <span>{{ currencyData.currency.full_name }}</span>
-                <span class="short-name">{{ currencyData.currency.name }}</span>
+                <span>{{ currencyData.full_name }}</span>
+                <span class="short-name">{{ currencyData.currency_name }}</span>
               </div>
             </div>
           </td>
-          <td>{{ formatNumber(currencyData.last_price) }}</td>
-          <td :style="{ color: currencyData.trend >= 0 ? 'green' : 'red' }">{{ formatNumber(currencyData.trend) }}</td>
+          <td>{{ currencyData.last_sell_price }}</td>
+          <td :style="{ color: currencyData.price_change_percent >= 0 ? 'green' : 'red' }">{{
+            currencyData.price_change_percent }}</td>
         </tr>
       </tbody>
     </table>
@@ -41,9 +44,9 @@ export default {
     return {
       currenciesData: [],
       preferences: [],
-      sortColumn: 'order',
+      sortColumn: 'orderIndex',
       sortDirection: 'asc',
-      selectedCurrencyId: null, // Track the selected currency ID
+      selectedCurrencyId: null,
     };
   },
 
@@ -54,16 +57,21 @@ export default {
 
   computed: {
     sortedCurrenciesData() {
-      return this.currenciesData.slice().filter(currencyData => this.isPreferredCurrency(currencyData.currency.id)).sort((a, b) => {
-        const aValue = a[this.sortColumn];
-        const bValue = b[this.sortColumn];
+      return this.currenciesData
+        .slice()
+        .filter(currencyData => this.isPreferredCurrency(currencyData.currency_id))
+        .sort((a, b) => {
+          const aValue = a[this.sortColumn];
+          const bValue = b[this.sortColumn];
 
-        if (typeof aValue === 'string') {
-          return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
-        } else {
-          return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
-        }
-      });
+          if (this.sortColumn === 'last_sell_price' || this.sortColumn === 'price_change_percent') {
+            return (parseFloat(aValue) - parseFloat(bValue)) * (this.sortDirection === 'asc' ? 1 : -1);
+          } else if (this.sortColumn === 'currency_name') {
+            return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+          } else {
+            return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+          }
+        });
     },
   },
 
@@ -71,7 +79,12 @@ export default {
     async fetchCurrencies() {
       try {
         const response = await allCurrencies();
-        this.currenciesData = response.data;
+        this.currenciesData = response.data.map((currencyData, index) => ({
+          ...currencyData,
+          orderIndex: index,
+          last_sell_price: currencyData.last_sell_price.toString(),
+          price_change_percent: currencyData.price_change_percent.toString(),
+        }));
       } catch (error) {
         console.error('Error', error);
       }
@@ -90,14 +103,6 @@ export default {
       return this.preferences.includes(currencyId);
     },
 
-    formatNumber(value) {
-      if (Number.isFinite(value)) {
-        return value.toFixed(2);
-      } else {
-        return '';
-      }
-    },
-
     sort(column) {
       if (this.sortColumn === column) {
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -107,12 +112,10 @@ export default {
       }
     },
 
-    // Method to handle row selection
     selectRow(currencyId) {
-      this.selectedCurrencyId = currencyId;
+      this.selectedCurrencyId = this.selectedCurrencyId === currencyId ? null : currencyId;
     },
 
-    // Check if the row is selected based on the currency ID
     isSelected(currencyId) {
       return this.selectedCurrencyId === currencyId;
     },
@@ -138,6 +141,10 @@ export default {
   cursor: pointer;
 }
 
+.currency-table th.order-header {
+  cursor: default; /* Set the cursor to default for the "Order" column header */
+}
+
 .currency-table th {
   background-color: #f2f2f2;
 }
@@ -155,14 +162,11 @@ export default {
 }
 
 /* Override the hover effect for selected rows to keep the green color */
-.currency-table tr.highlighted:hover {
-  background-color: #cce4ff; /* Keep the highlighted background color */
-  color: #333; /* Keep the dark font color */
-}
-
-/* Add the following to keep the green color when row is both highlighted and selected */
 .currency-table tr.highlighted.selected {
   background-color: #cce4ff;
+  /* Keep the highlighted background color */
+  color: #333;
+  /* Keep the dark font color */
 }
 
 .currency-image {
