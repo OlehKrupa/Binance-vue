@@ -54,7 +54,7 @@ export default {
     },
     async fetchDataFromAPI() {
       try {
-        const response = await currencyHistory(6);
+        const response = await currencyHistory(23);
         this.apiData = Object.values(response.data);
         this.createChart();
       } catch (error) {
@@ -64,16 +64,16 @@ export default {
     calculateNumXTicks(width) {
       if (width <= 400) {
         return 4;
-      } else if (width <= 800) {
-        return 6;
+      } else if (width <= 1000) {
+        return 5;
       } else {
-        return 8;
+        return 6;
       }
     },
     createChart() {
       if (!this.apiData) return;
 
-      const margin = { top: 30, right: 30, bottom: 30, left: 60 };
+      const margin = { top: 30, right: 30, bottom: 30, left: 80 };
       const width = this.containerWidth - margin.left - margin.right;
       const height = this.containerHeight - margin.top - margin.bottom;
 
@@ -135,7 +135,10 @@ export default {
             .attr('y2', -height)
             .attr('stroke-opacity', 0.2)
             .attr('stroke-dasharray', '2,2')
-        );
+        )
+        .selectAll('.tick')
+        .selectAll('text') // Select all tick labels on x-axis
+        .style('font-size', '14px'); // Adjust the font size as needed
 
       svg.append('g')
         .call(yAxis)
@@ -147,16 +150,13 @@ export default {
             .attr('x2', width)
             .attr('stroke-opacity', 0.2)
             .attr('stroke-dasharray', '2,2')
-        );
+        )
+        .selectAll('.tick')
+        .selectAll('text') // Select all tick labels on y-axis
+        .style('font-size', '14px'); // Adjust the font size as needed
 
-      // Use one of the following curve functions
-      // const line = d3.line()
-      //   .defined((d) => !isNaN(+d.buy))
-      //   .x((d) => x(new Date(d.created_at)))
-      //   .y((d) => y(+d.buy))
-      //   .curve(d3.curveCardinal.tension(0.5)); // Use the desired tension value
-
-      const line = d3.line()
+      const line = d3
+        .line()
         .defined((d) => !isNaN(+d.buy))
         .x((d) => x(new Date(d.created_at)))
         .y((d) => y(+d.buy))
@@ -176,9 +176,44 @@ export default {
         .attr('class', 'point')
         .attr('cx', (d) => x(new Date(d.created_at)))
         .attr('cy', (d) => y(+d.buy))
-        .attr('r', 3)
+        .attr('r', 4)
         .attr('fill', 'steelblue');
+
+      const tooltip = d3
+        .select(this.$refs.chart)
+        .append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0)
+        .style('position', 'absolute')
+        .style('pointer-events', 'none')
+        .style('background-color', '#f9f9f9')
+        .style('border', '1px solid #ccc')
+        .style('border-radius', '5px')
+        .style('padding', '5px');
+
+      svg.selectAll('.point')
+        .on('mouseover', (event, d) => {
+          // Get chart container position and dimensions
+          const chartContainerRect = this.$refs.chart.getBoundingClientRect();
+
+          // Use event.clientX and event.clientY to get the cursor's position relative to the chart container
+          const xPosition = event.clientX - chartContainerRect.left;
+          const yPosition = event.clientY - chartContainerRect.top;
+
+          // Adjust tooltip position below and left of the point
+          tooltip
+            .style('left', `${xPosition + 20}px`) // Offset by 10 pixels to the left
+            .style('top', `${yPosition + 50}px`) // Offset by 10 pixels below
+            .html(
+              `${d3.timeFormat('%b %d, %H:%M')(new Date(d.created_at))}<br>$ ${d3.format('.2f')(+d.buy)}`
+            )
+            .style('opacity', 1);
+        })
+        .on('mouseout', () => {
+          tooltip.style('opacity', 0);
+        });
     },
+
     selectHours(hours) {
       this.selectedHours = hours;
     },
@@ -213,5 +248,24 @@ button {
 .btn-selected {
   background-color: #007bff;
   color: #fff;
+}
+
+/* Increase the font size of x-axis tick labels */
+.axis .tick {
+  font-size: 14px; /* Adjust the font size as needed */
+}
+
+/* Increase the font size of y-axis tick labels */
+.axis .tick text {
+  font-size: 14px; /* Adjust the font size as needed */
+}
+
+.tooltip {
+  position: absolute;
+  padding: 5px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  pointer-events: none; /* Prevent the tooltip from blocking mouse events on chart elements */
 }
 </style>
