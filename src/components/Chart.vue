@@ -29,7 +29,7 @@ export default {
       containerHeight: 0,
       apiData: null,
       selectedHours: 24,
-      hoursOptions: [1, 12, 24, 48, 72, 168],
+      hoursOptions: [1, 6, 12, 24, 48, 72],
     };
   },
   mounted() {
