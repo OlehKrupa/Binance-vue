@@ -26,9 +26,9 @@
               </div>
             </div>
           </td>
-          <td>{{ currencyData.last_sell_price }}</td>
+          <td>{{ parseFloat(currencyData.last_sell_price).toFixed(2) }}</td>
           <td :style="{ color: currencyData.price_change_percent >= 0 ? 'green' : 'red' }">{{
-            currencyData.price_change_percent }}</td>
+            parseFloat(currencyData.price_change_percent).toFixed(2) }}</td>
         </tr>
       </tbody>
     </table>
@@ -82,8 +82,8 @@ export default {
         this.currenciesData = response.data.map((currencyData, index) => ({
           ...currencyData,
           orderIndex: index,
-          last_sell_price: currencyData.last_sell_price.toString(),
-          price_change_percent: currencyData.price_change_percent.toString(),
+          last_sell_price: parseFloat(currencyData.last_sell_price).toFixed(2),
+          price_change_percent: parseFloat(currencyData.price_change_percent).toFixed(2),
         }));
       } catch (error) {
         console.error('Error', error);
