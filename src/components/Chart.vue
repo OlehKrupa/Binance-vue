@@ -28,7 +28,7 @@ export default {
       containerWidth: 0,
       containerHeight: 0,
       apiData: null,
-      selectedHours: 24,
+      selectedHours: 6,
       hoursOptions: [1, 6, 12, 24, 48, 72],
     };
   },
@@ -54,7 +54,7 @@ export default {
     },
     async fetchDataFromAPI() {
       try {
-        const response = await currencyHistory(23);
+        const response = await currencyHistory(6);
         this.apiData = Object.values(response.data);
         this.createChart();
       } catch (error) {
