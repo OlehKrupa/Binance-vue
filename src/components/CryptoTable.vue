@@ -50,7 +50,7 @@ export default {
       preferences: [],
       sortedColumn: 'full_name',
       sortDirection: 'asc',
-      searchQuery: '', // New property for the search query
+      searchQuery: '',
     };
   },
 
@@ -67,7 +67,6 @@ export default {
         const aValue = a[this.sortedColumn];
         const bValue = b[this.sortedColumn];
 
-        // For string comparison, use localeCompare method
         return aValue.toString().localeCompare(bValue.toString()) * (this.sortDirection === 'asc' ? 1 : -1);
       });
 
@@ -144,81 +143,10 @@ export default {
         this.sortDirection = 'asc';
       }
     },
-
-    filterCurrencies() {
-      // Nothing to do here, the filtering is done in the computed property.
-    },
   },
 };
 </script>
 
 <style>
-.table-container {
-  margin: 20px;
-}
-
-.currency-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ddd;
-}
-
-.currency-table th,
-.currency-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
-}
-
-.currency-table th.order-header {
-  cursor: default;
-}
-
-.currency-table th {
-  background-color: #f2f2f2;
-}
-
-.currency-table tr:hover {
-  background-color: #f9f9f9;
-}
-
-.currency-image {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-.highlighted {
-  background-color: #cf9;
-}
-
-.currency-info {
-  display: flex;
-  align-items: center;
-}
-
-.currency-names {
-  margin-left: 5px;
-}
-
-.short-name {
-  margin-left: 5px;
-  font-size: 12px;
-  color: #666;
-}
-
-.table-container {
-  margin: 10px;
-}
-
-.search-container {
-  margin-bottom: 10px;
-}
-
-.search-input {
-  padding: 5px;
-  width: 200px;
-  border: 1px solid #ddd;
-}
+@import url('../assets/table.css');
 </style>

@@ -137,8 +137,8 @@ export default {
             .attr('stroke-dasharray', '2,2')
         )
         .selectAll('.tick')
-        .selectAll('text') // Select all tick labels on x-axis
-        .style('font-size', '14px'); // Adjust the font size as needed
+        .selectAll('text')
+        .style('font-size', '14px'); 
 
       svg.append('g')
         .call(yAxis)
@@ -152,15 +152,15 @@ export default {
             .attr('stroke-dasharray', '2,2')
         )
         .selectAll('.tick')
-        .selectAll('text') // Select all tick labels on y-axis
-        .style('font-size', '14px'); // Adjust the font size as needed
+        .selectAll('text') 
+        .style('font-size', '14px'); 
 
       const line = d3
         .line()
         .defined((d) => !isNaN(+d.buy))
         .x((d) => x(new Date(d.created_at)))
         .y((d) => y(+d.buy))
-        .curve(d3.curveCatmullRom.alpha(0.5)); // Use the desired alpha value
+        .curve(d3.curveCatmullRom.alpha(0.5));
 
       svg.append('path')
         .datum(filteredData)
@@ -193,17 +193,14 @@ export default {
 
       svg.selectAll('.point')
         .on('mouseover', (event, d) => {
-          // Get chart container position and dimensions
           const chartContainerRect = this.$refs.chart.getBoundingClientRect();
 
-          // Use event.clientX and event.clientY to get the cursor's position relative to the chart container
           const xPosition = event.clientX - chartContainerRect.left;
           const yPosition = event.clientY - chartContainerRect.top;
 
-          // Adjust tooltip position below and left of the point
           tooltip
-            .style('left', `${xPosition + 20}px`) // Offset by 10 pixels to the left
-            .style('top', `${yPosition + 50}px`) // Offset by 10 pixels below
+            .style('left', `${xPosition + 20}px`) 
+            .style('top', `${yPosition + 50}px`) 
             .html(
               `${d3.timeFormat('%b %d, %H:%M')(new Date(d.created_at))}<br>$ ${d3.format('.2f')(+d.buy)}`
             )
@@ -222,50 +219,5 @@ export default {
 </script>
 
 <style>
-.chart-container {
-  width: 100%;
-  height: 400px;
-}
-
-.select-container {
-  padding: 10px;
-}
-
-.btn-group {
-  display: inline-flex;
-  justify-content: center;
-}
-
-button {
-  cursor: pointer;
-  padding: 5px 10px;
-  margin: 0 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #fff;
-}
-
-.btn-selected {
-  background-color: #007bff;
-  color: #fff;
-}
-
-/* Increase the font size of x-axis tick labels */
-.axis .tick {
-  font-size: 14px; /* Adjust the font size as needed */
-}
-
-/* Increase the font size of y-axis tick labels */
-.axis .tick text {
-  font-size: 14px; /* Adjust the font size as needed */
-}
-
-.tooltip {
-  position: absolute;
-  padding: 5px;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  pointer-events: none; /* Prevent the tooltip from blocking mouse events on chart elements */
-}
+@import url('../assets/chart.css');
 </style>
