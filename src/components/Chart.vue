@@ -3,8 +3,12 @@
     <div class="chart-container" ref="chart"></div>
     <div class="select-container text-center">
       <div class="btn-group">
-        <button v-for="hours in hoursOptions" :key="hours" :class="{ 'btn-selected': selectedHours === hours }"
-          @click="selectHours(hours)">
+        <button
+          v-for="hours in hoursOptions"
+          :key="hours"
+          :class="{ 'btn-selected': selectedHours === hours }"
+          @click="selectHours(hours)"
+        >
           {{ hours >= 24 ? hours / 24 + ' days' : hours + ' Hour' }}
         </button>
       </div>
@@ -14,7 +18,8 @@
 
 <script>
 import * as d3 from 'd3';
-import { currencyHistory } from "../http/history-api";
+import { currencyHistory } from '../http/history-api';
+import { curveCardinal, curveCatmullRom } from 'd3-shape';
 
 export default {
   name: 'Chart',
@@ -53,7 +58,7 @@ export default {
         this.apiData = Object.values(response.data);
         this.createChart();
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     },
     calculateNumXTicks(width) {
@@ -97,10 +102,7 @@ export default {
         return date >= startDate && date <= endDate;
       });
 
-      const x = d3
-        .scaleTime()
-        .domain([startDate, endDate])
-        .range([0, width]);
+      const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
 
       const yValues = filteredData.map((d) => +d.buy);
       const yMidpoint = d3.mean(yValues);
@@ -114,34 +116,51 @@ export default {
       const numXTicks = this.calculateNumXTicks(width);
       const numYTicks = Math.floor(height / 100);
 
-      const xAxis = d3.axisBottom(x).ticks(timeInterval).tickFormat(d3.timeFormat("%b %d, %H:%M")).ticks(numXTicks);
-      const yAxis = d3.axisLeft(y).ticks(numYTicks).tickFormat(d3.format(".2f"));
+      const xAxis = d3
+        .axisBottom(x)
+        .ticks(timeInterval)
+        .tickFormat(d3.timeFormat('%b %d, %H:%M'))
+        .ticks(numXTicks);
+
+      const yAxis = d3.axisLeft(y).ticks(numYTicks).tickFormat(d3.format('.2f'));
 
       svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(xAxis)
-        .call(g => g.select(".domain"))
-        .call(g => g.selectAll('.tick line').clone()
-          .attr('y2', -height)
-          .attr('stroke-opacity', 0.2)
-          .attr("stroke-dasharray", "2,2")
+        .call((g) => g.select('.domain'))
+        .call((g) =>
+          g
+            .selectAll('.tick line')
+            .clone()
+            .attr('y2', -height)
+            .attr('stroke-opacity', 0.2)
+            .attr('stroke-dasharray', '2,2')
         );
 
       svg.append('g')
         .call(yAxis)
-        .call(g => g.select(".domain"))
-        .call(g => g.selectAll('.tick line').clone()
-          .attr('x2', width)
-          .attr('stroke-opacity', 0.2)
-          .attr("stroke-dasharray", "2,2")
+        .call((g) => g.select('.domain'))
+        .call((g) =>
+          g
+            .selectAll('.tick line')
+            .clone()
+            .attr('x2', width)
+            .attr('stroke-opacity', 0.2)
+            .attr('stroke-dasharray', '2,2')
         );
 
-      const line = d3
-        .line()
+      // Use one of the following curve functions
+      // const line = d3.line()
+      //   .defined((d) => !isNaN(+d.buy))
+      //   .x((d) => x(new Date(d.created_at)))
+      //   .y((d) => y(+d.buy))
+      //   .curve(d3.curveCardinal.tension(0.5)); // Use the desired tension value
+
+      const line = d3.line()
         .defined((d) => !isNaN(+d.buy))
         .x((d) => x(new Date(d.created_at)))
         .y((d) => y(+d.buy))
-        .curve(d3.curveLinear);
+        .curve(d3.curveCatmullRom.alpha(0.5)); // Use the desired alpha value
 
       svg.append('path')
         .datum(filteredData)
