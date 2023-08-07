@@ -3,13 +3,9 @@
     <div class="chart-container" ref="chart"></div>
     <div class="select-container text-center">
       <div class="btn-group">
-        <button
-          v-for="hours in hoursOptions"
-          :key="hours"
-          :class="{ 'btn-selected': selectedHours === hours }"
-          @click="selectHours(hours)"
-        >
-          {{ hours >= 24 ? hours / 24 + ' days' : hours + ' Hour' }}
+        <button v-for="hours in hoursOptions" :key="hours" :class="{ 'btn-selected': selectedHours === hours }"
+          @click="selectHours(hours)">
+          {{ formatHours(hours) }}
         </button>
       </div>
     </div>
@@ -19,7 +15,6 @@
 <script>
 import * as d3 from 'd3';
 import { currencyHistory } from '../http/history-api';
-import { curveCardinal, curveCatmullRom } from 'd3-shape';
 
 export default {
   name: 'Chart',
@@ -46,6 +41,18 @@ export default {
     },
   },
   methods: {
+    formatHours(hours) {
+      return hours >= 24 ? hours / 24 + ' days' : hours + ' Hour';
+    },
+    calculateNumXTicks(width) {
+      if (width <= 400) {
+        return 4;
+      } else if (width <= 1000) {
+        return 5;
+      } else {
+        return 6;
+      }
+    },
     async updateDimensions() {
       const chartContainer = this.$refs.chart;
       this.containerWidth = chartContainer.clientWidth;
@@ -59,15 +66,7 @@ export default {
         this.createChart();
       } catch (error) {
         console.error('Error fetching data:', error);
-      }
-    },
-    calculateNumXTicks(width) {
-      if (width <= 400) {
-        return 4;
-      } else if (width <= 1000) {
-        return 5;
-      } else {
-        return 6;
+        // Optionally, display an error message to the user
       }
     },
     createChart() {
@@ -138,7 +137,7 @@ export default {
         )
         .selectAll('.tick')
         .selectAll('text')
-        .style('font-size', '14px'); 
+        .style('font-size', '14px');
 
       svg.append('g')
         .call(yAxis)
@@ -152,8 +151,8 @@ export default {
             .attr('stroke-dasharray', '2,2')
         )
         .selectAll('.tick')
-        .selectAll('text') 
-        .style('font-size', '14px'); 
+        .selectAll('text')
+        .style('font-size', '14px');
 
       const line = d3
         .line()
@@ -194,13 +193,12 @@ export default {
       svg.selectAll('.point')
         .on('mouseover', (event, d) => {
           const chartContainerRect = this.$refs.chart.getBoundingClientRect();
-
           const xPosition = event.clientX - chartContainerRect.left;
           const yPosition = event.clientY - chartContainerRect.top;
 
           tooltip
-            .style('left', `${xPosition + 20}px`) 
-            .style('top', `${yPosition + 50}px`) 
+            .style('left', `${xPosition + 20}px`)
+            .style('top', `${yPosition + 50}px`)
             .html(
               `${d3.timeFormat('%b %d, %H:%M')(new Date(d.created_at))}<br>$ ${d3.format('.2f')(+d.buy)}`
             )
@@ -219,5 +217,6 @@ export default {
 </script>
 
 <style>
+/* Some style improvements can be made here */
 @import url('../assets/chart.css');
 </style>
