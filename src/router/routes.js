@@ -2,6 +2,7 @@ import LoginPage from "../pages/LoginPage.vue";
 import RegisterPage from "../pages/RegisterPage.vue";
 import NotFoundErrorPage from "../pages/errors/NotFoundErrorPage.vue";
 import DashboardPage from "../pages/DashboardPage.vue";
+import DashboardPageBus from "../pages/DashboardPageBus.vue";
 import HomePage from "../pages/HomePage.vue";
 import PreferencesPage from "../pages/PreferencesPage.vue";
 
@@ -15,6 +16,11 @@ const routes = [
     path: "/dashboard",
     component: DashboardPage,
     name: "dashboard",
+  },
+  {
+    path: "/dashboard_bus",
+    component: DashboardPageBus,
+    name: "dashboard_bus",
   },
   {
     path: "/preferences",

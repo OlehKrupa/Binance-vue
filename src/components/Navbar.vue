@@ -15,6 +15,9 @@
                         <router-link :to="{ name: 'dashboard' }" class="nav-link">Dashboard</router-link>
                     </li>
                     <li class="nav-item">
+                        <router-link :to="{ name: 'dashboard_bus' }" class="nav-link">Dashboard2</router-link>
+                    </li>
+                    <li class="nav-item">
                         <router-link :to="{ name: 'preferences' }" class="nav-link">Preferences</router-link>
                     </li> 
                 </ul>
