@@ -1,0 +1,177 @@
+<template>
+  <div class="table-container">
+    <table class="currency-table">
+      <thead>
+        <tr>
+          <th class="order-header">Order</th>
+          <th @click="sort('currency_name')">Currency<span v-if="sortColumn === 'currency_name'"> {{
+            sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="sort('last_sell_price')">Price<span v-if="sortColumn === 'last_sell_price'"> {{ sortDirection ===
+            'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="sort('price_change_percent')">Rate<span v-if="sortColumn === 'price_change_percent'"> {{
+            sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency_id"
+          :class="{ 'highlighted': isSelected(currencyData.currency_id), 'selected': selectedCurrencyId === currencyData.currency_id }"
+          @click="selectRow(currencyData.currency_id)">
+          <td>{{ index + 1 }}</td>
+          <td>
+            <div class="currency-info">
+              <img :src="currencyData.image_url" alt="currency img" class="currency-image" />
+              <div class="currency-names">
+                <span>{{ currencyData.full_name }}</span>
+                <span class="short-name">{{ currencyData.currency_name }}</span>
+              </div>
+            </div>
+          </td>
+          <td>{{ parseFloat(currencyData.last_sell_price).toFixed(2) }}</td>
+          <td :style="{ color: currencyData.price_change_percent >= 0 ? 'green' : 'red' }">{{
+            parseFloat(currencyData.price_change_percent).toFixed(2) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+import { ref, watch } from 'vue';
+import { allCurrencies } from '../http/currency-api';
+import { userPreferences } from '../http/user-api';
+
+const selectedCurrencyId = ref(props.selectedCurrencyId);
+watch(selectedCurrencyId, (newValue) => {
+  if (newValue !== props.selectedCurrencyId) {
+    emit('currency-selected', newValue);
+  }
+});
+
+export default {
+  props: {
+    selectedCurrencyId: {
+      type: Number,
+      required: true,
+    },
+  },
+  created() {
+    eventBus.$on('currency-selected', (selectedCurrencyId) => {
+      this.selectedCurrencyId = selectedCurrencyId;
+    });
+  },
+
+  data() {
+    return {
+      currenciesData: [],
+      preferences: [],
+      sortColumn: 'orderIndex',
+      sortDirection: 'asc',
+      selectedCurrencyId: null,
+    };
+  },
+
+  async beforeMount() {
+    await this.fetchPreferences();
+    await this.fetchCurrencies();
+
+    const selectedCurrencyId = this.getSelectedCurrencyIdFromLocalStorage();
+
+    if (!selectedCurrencyId && this.sortedCurrenciesData.length > 0) {
+      this.selectedCurrencyId = this.sortedCurrenciesData[0].currency_id;
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
+    } else if (selectedCurrencyId && !this.isPreferredCurrency(selectedCurrencyId)) {
+      this.selectedCurrencyId = this.preferences.length > 0 ? this.preferences[0] : null;
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
+    } else {
+      this.selectedCurrencyId = selectedCurrencyId;
+    }
+  },
+
+  computed: {
+    sortedCurrenciesData() {
+      return this.currenciesData
+        .slice()
+        .filter(currencyData => this.isPreferredCurrency(currencyData.currency_id))
+        .sort((a, b) => {
+          const aValue = a[this.sortColumn];
+          const bValue = b[this.sortColumn];
+
+          if (this.sortColumn === 'last_sell_price' || this.sortColumn === 'price_change_percent') {
+            return (parseFloat(aValue) - parseFloat(bValue)) * (this.sortDirection === 'asc' ? 1 : -1);
+          } else if (this.sortColumn === 'currency_name') {
+            return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+          } else {
+            return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+          }
+        });
+    },
+  },
+
+  methods: {
+    async fetchCurrencies() {
+      try {
+        const response = await allCurrencies();
+        this.currenciesData = response.data.map((currencyData, index) => ({
+          ...currencyData,
+          orderIndex: index,
+          last_sell_price: parseFloat(currencyData.last_sell_price).toFixed(2),
+          price_change_percent: parseFloat(currencyData.price_change_percent).toFixed(2),
+        }));
+      } catch (error) {
+        console.error('Error', error);
+      }
+    },
+
+    async fetchPreferences() {
+      try {
+        const response = await userPreferences();
+        this.preferences = response.data;
+      } catch (error) {
+        console.error('Error', error);
+      }
+    },
+
+    isPreferredCurrency(currencyId) {
+      return this.preferences.includes(currencyId);
+    },
+
+    sort(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
+      }
+    },
+
+    selectRow(currencyId) {
+      if (this.selectedCurrencyId === currencyId) {
+        return;
+      }
+
+      this.selectedCurrencyId = this.selectedCurrencyId === currencyId ? null : currencyId;
+      this.$emit('currency-selected', this.selectedCurrencyId); // Emit the event to the parent component
+
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
+    },
+
+    isSelected(currencyId) {
+      return this.selectedCurrencyId === currencyId;
+    },
+
+    saveSelectedCurrencyIdToLocalStorage(currencyId) {
+      localStorage.setItem('selectedCurrencyId', currencyId);
+    },
+
+    getSelectedCurrencyIdFromLocalStorage() {
+      const selectedCurrencyId = localStorage.getItem('selectedCurrencyId');
+      return selectedCurrencyId ? parseInt(selectedCurrencyId) : null;
+    },
+
+  },
+};
+</script>
+
+<style>
+@import url('../assets/table.css');
+</style>
