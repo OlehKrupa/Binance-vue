@@ -61,16 +61,20 @@ export default {
 
   computed: {
     sortedCurrenciesData() {
-      let sortedData = this.currenciesData.slice();
+      return this.currenciesData
+        .slice()
+        .sort((a, b) => {
+          const aValue = a[this.sortedColumn];
+          const bValue = b[this.sortedColumn];
 
-      sortedData = sortedData.sort((a, b) => {
-        const aValue = a[this.sortedColumn];
-        const bValue = b[this.sortedColumn];
-
-        return aValue.toString().localeCompare(bValue.toString()) * (this.sortDirection === 'asc' ? 1 : -1);
-      });
-
-      return sortedData;
+          if (this.sortedColumn === 'last_sell_price' || this.sortedColumn === 'price_change_percent') {
+            return (parseFloat(aValue) - parseFloat(bValue)) * (this.sortDirection === 'asc' ? 1 : -1);
+          } else if (this.sortedColumn === 'full_name') {
+            return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+          } else {
+            return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+          }
+        });
     },
 
     filteredCurrencies() {
