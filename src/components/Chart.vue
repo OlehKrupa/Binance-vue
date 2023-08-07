@@ -17,7 +17,13 @@ import * as d3 from 'd3';
 import { currencyHistory } from '../http/history-api';
 
 export default {
-  name: 'Chart',
+  props: {
+    selectedCurrencyId: {
+      type: Number,
+      required: true,
+    },
+  },
+
   data() {
     return {
       containerWidth: 0,
@@ -27,23 +33,31 @@ export default {
       hoursOptions: [1, 6, 12, 24, 48, 72],
     };
   },
+
   mounted() {
     this.updateDimensions();
     window.addEventListener('resize', this.updateDimensions);
     this.fetchDataFromAPI();
   },
+
   beforeUnmount() {
     window.removeEventListener('resize', this.updateDimensions);
   },
+
   watch: {
     selectedHours() {
       this.createChart();
     },
+    selectedCurrencyId() {
+      this.fetchDataFromAPI();
+    },
   },
+
   methods: {
     formatHours(hours) {
       return hours >= 24 ? hours / 24 + ' days' : hours + ' Hour';
     },
+
     calculateNumXTicks(width) {
       if (width <= 400) {
         return 4;
@@ -53,15 +67,17 @@ export default {
         return 6;
       }
     },
+
     async updateDimensions() {
       const chartContainer = this.$refs.chart;
       this.containerWidth = chartContainer.clientWidth;
       this.containerHeight = chartContainer.clientHeight;
       this.createChart();
     },
+
     async fetchDataFromAPI() {
       try {
-        const response = await currencyHistory(23);
+        const response = await currencyHistory(this.selectedCurrencyId);
         this.apiData = Object.values(response.data);
         this.createChart();
       } catch (error) {
@@ -69,10 +85,11 @@ export default {
         // Optionally, display an error message to the user
       }
     },
+
     createChart() {
       if (!this.apiData) return;
 
-      const margin = { top: 30, right: 30, bottom: 30, left: 80 };
+      const margin = { top: 30, right: 60, bottom: 30, left: 80 };
       const width = this.containerWidth - margin.left - margin.right;
       const height = this.containerHeight - margin.top - margin.bottom;
 
