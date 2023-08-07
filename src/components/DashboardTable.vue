@@ -53,6 +53,18 @@ export default {
   async beforeMount() {
     await this.fetchPreferences();
     await this.fetchCurrencies();
+
+    const selectedCurrencyId = this.getSelectedCurrencyIdFromLocalStorage();
+
+    if (!selectedCurrencyId && this.sortedCurrenciesData.length > 0) {
+      this.selectedCurrencyId = this.sortedCurrenciesData[0].currency_id;
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
+    } else if (selectedCurrencyId && !this.isPreferredCurrency(selectedCurrencyId)) {
+      this.selectedCurrencyId = this.preferences.length > 0 ? this.preferences[0] : null;
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
+    } else {
+      this.selectedCurrencyId = selectedCurrencyId;
+    }
   },
 
   computed: {
@@ -113,12 +125,29 @@ export default {
     },
 
     selectRow(currencyId) {
+      if (this.selectedCurrencyId === currencyId) {
+        return;
+      }
+
       this.selectedCurrencyId = this.selectedCurrencyId === currencyId ? null : currencyId;
+      this.$emit('currency-selected', this.selectedCurrencyId); // Emit the event to the parent component
+
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
     },
 
     isSelected(currencyId) {
       return this.selectedCurrencyId === currencyId;
     },
+
+    saveSelectedCurrencyIdToLocalStorage(currencyId) {
+      localStorage.setItem('selectedCurrencyId', currencyId);
+    },
+
+    getSelectedCurrencyIdFromLocalStorage() {
+      const selectedCurrencyId = localStorage.getItem('selectedCurrencyId');
+      return selectedCurrencyId ? parseInt(selectedCurrencyId) : null;
+    },
+
   },
 };
 </script>
