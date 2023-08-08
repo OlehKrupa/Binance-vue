@@ -1,15 +1,11 @@
 <template>
   <div class="table-container">
-    <div class="search-container">
-      <input type="text" v-model="searchQuery" @input="filterCurrencies" placeholder="Search currency..."
-        class="search-input" />
-    </div>
     <table class="currency-table">
       <thead>
         <tr>
           <th class="order-header">Order</th>
-          <th @click="sort('full_name')">Currency<span v-if="isColumnSorted('full_name')"> {{
-            getSortDirection('full_name') }}</span></th>
+          <th @click="sort('currency_name')">Currency<span v-if="isColumnSorted('currency_name')"> {{
+            getSortDirection('currency_name') }}</span></th>
           <th @click="sort('last_sell_price')">Price<span v-if="isColumnSorted('last_sell_price')"> {{
             getSortDirection('last_sell_price') }}</span></th>
           <th @click="sort('price_change_percent')">Rate<span v-if="isColumnSorted('price_change_percent')"> {{
@@ -17,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(currencyData, index) in filteredCurrencies" :key="currencyData.currency_id"
+        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency_id"
           :class="{ 'highlighted': isPreferredCurrency(currencyData.currency_id) }"
           @click="updateUserPreferences(currencyData.currency_id)">
           <td>{{ index + 1 }}</td>
@@ -48,9 +44,8 @@ export default {
     return {
       currenciesData: [],
       preferences: [],
-      sortedColumn: 'full_name',
-      sortDirection: 'asc',
-      searchQuery: '',
+      sortedColumn: 'orderIndex', // New data property to track the currently sorted column
+      sortDirection: 'asc', // New data property to track the sorting direction
     };
   },
 
@@ -61,31 +56,23 @@ export default {
 
   computed: {
     sortedCurrenciesData() {
-      return this.currenciesData
-        .slice()
-        .sort((a, b) => {
-          const aValue = a[this.sortedColumn];
-          const bValue = b[this.sortedColumn];
+      let sortedData = this.currenciesData.slice();
 
-          if (this.sortedColumn === 'last_sell_price' || this.sortedColumn === 'price_change_percent') {
-            return (parseFloat(aValue) - parseFloat(bValue)) * (this.sortDirection === 'asc' ? 1 : -1);
-          } else if (this.sortedColumn === 'full_name') {
-            return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
-          } else {
-            return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
-          }
-        });
-    },
+      sortedData = sortedData.sort((a, b) => {
+        const aValue = a[this.sortedColumn];
+        const bValue = b[this.sortedColumn];
 
-    filteredCurrencies() {
-      if (this.searchQuery.length === 0) {
-        return this.sortedCurrenciesData;
-      }
+        if (this.sortedColumn === 'orderIndex') {
+          // Sort the "orderIndex" numerically
+          return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+        } else if (this.sortedColumn === 'last_sell_price' || this.sortedColumn === 'price_change_percent') {
+          return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
+        } else {
+          return aValue.toString().localeCompare(bValue.toString()) * (this.sortDirection === 'asc' ? 1 : -1);
+        }
+      });
 
-      const query = this.searchQuery.toLowerCase();
-      return this.sortedCurrenciesData.filter((currencyData) =>
-        currencyData.full_name.toLowerCase().includes(query)
-      );
+      return sortedData;
     },
   },
 
@@ -152,5 +139,59 @@ export default {
 </script>
 
 <style>
-@import url('../assets/table.css');
+.table-container {
+  margin: 20px;
+}
+
+.currency-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+}
+
+.currency-table th,
+.currency-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  /* Add cursor pointer on sortable column headers */
+}
+
+.currency-table th.order-header {
+  cursor: default; /* Set the cursor to default for the "Order" column header */
+}
+
+.currency-table th {
+  background-color: #f2f2f2;
+}
+
+.currency-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.currency-image {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.highlighted {
+  background-color: #cf9;
+}
+
+.currency-info {
+  display: flex;
+  align-items: center;
+}
+
+.currency-names {
+  margin-left: 5px;
+}
+
+.short-name {
+  margin-left: 5px;
+  font-size: 12px;
+  color: #666;
+}
 </style>
