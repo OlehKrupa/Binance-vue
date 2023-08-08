@@ -26,9 +26,9 @@
               </div>
             </div>
           </td>
-          <td>{{ currencyData.last_sell_price }}</td>
+          <td>{{ parseFloat(currencyData.last_sell_price).toFixed(2) }}</td>
           <td :style="{ color: currencyData.price_change_percent >= 0 ? 'green' : 'red' }">{{
-            currencyData.price_change_percent }}</td>
+            parseFloat(currencyData.price_change_percent).toFixed(2) }}</td>
         </tr>
       </tbody>
     </table>
@@ -53,6 +53,18 @@ export default {
   async beforeMount() {
     await this.fetchPreferences();
     await this.fetchCurrencies();
+
+    const selectedCurrencyId = this.getSelectedCurrencyIdFromLocalStorage();
+
+    if (!selectedCurrencyId && this.sortedCurrenciesData.length > 0) {
+      this.selectedCurrencyId = this.sortedCurrenciesData[0].currency_id;
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
+    } else if (selectedCurrencyId && !this.isPreferredCurrency(selectedCurrencyId)) {
+      this.selectedCurrencyId = this.preferences.length > 0 ? this.preferences[0] : null;
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
+    } else {
+      this.selectedCurrencyId = selectedCurrencyId;
+    }
   },
 
   computed: {
@@ -82,8 +94,8 @@ export default {
         this.currenciesData = response.data.map((currencyData, index) => ({
           ...currencyData,
           orderIndex: index,
-          last_sell_price: currencyData.last_sell_price.toString(),
-          price_change_percent: currencyData.price_change_percent.toString(),
+          last_sell_price: parseFloat(currencyData.last_sell_price).toFixed(2),
+          price_change_percent: parseFloat(currencyData.price_change_percent).toFixed(2),
         }));
       } catch (error) {
         console.error('Error', error);
@@ -113,81 +125,33 @@ export default {
     },
 
     selectRow(currencyId) {
+      if (this.selectedCurrencyId === currencyId) {
+        return;
+      }
+
       this.selectedCurrencyId = this.selectedCurrencyId === currencyId ? null : currencyId;
+      this.$emit('currency-selected', this.selectedCurrencyId); // Emit the event to the parent component
+
+      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
     },
 
     isSelected(currencyId) {
       return this.selectedCurrencyId === currencyId;
     },
+
+    saveSelectedCurrencyIdToLocalStorage(currencyId) {
+      localStorage.setItem('selectedCurrencyId', currencyId);
+    },
+
+    getSelectedCurrencyIdFromLocalStorage() {
+      const selectedCurrencyId = localStorage.getItem('selectedCurrencyId');
+      return selectedCurrencyId ? parseInt(selectedCurrencyId) : null;
+    },
+
   },
 };
 </script>
 
 <style>
-.table-container {
-  margin: 20px;
-}
-
-.currency-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ddd;
-}
-
-.currency-table th,
-.currency-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
-}
-
-.currency-table th.order-header {
-  cursor: default; /* Set the cursor to default for the "Order" column header */
-}
-
-.currency-table th {
-  background-color: #f2f2f2;
-}
-
-/* Modify the hover effect to have a subtle blue highlight for unselected rows */
-.currency-table tr:not(.highlighted):hover {
-  background-color: #f0f5ff;
-}
-
-/* Modify the highlighted class to have a more muted blue background and change font color to a darker shade */
-.currency-table tr.highlighted {
-  background-color: #cce4ff;
-  color: #333;
-  cursor: pointer;
-}
-
-/* Override the hover effect for selected rows to keep the green color */
-.currency-table tr.highlighted.selected {
-  background-color: #cce4ff;
-  /* Keep the highlighted background color */
-  color: #333;
-  /* Keep the dark font color */
-}
-
-.currency-image {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-.currency-info {
-  display: flex;
-  align-items: center;
-}
-
-.currency-names {
-  margin-left: 5px;
-}
-
-.short-name {
-  margin-left: 5px;
-  font-size: 12px;
-  color: #666;
-}
+@import url('../assets/table.css');
 </style>
