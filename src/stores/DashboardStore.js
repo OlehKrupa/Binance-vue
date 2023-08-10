@@ -20,6 +20,7 @@ export const useDashboardStore = defineStore('dashboardStore', () => {
   const isPreferredCurrency = currencyId => preferences.value.includes(currencyId);
 
   const sortedCurrenciesData = computed(() => {
+    console.log(preferences);
     return currenciesData.value
       .slice()
       .filter(currencyData => isPreferredCurrency(currencyData.currency_id))

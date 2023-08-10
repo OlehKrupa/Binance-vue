@@ -4,8 +4,8 @@
       <div class="col-md-8">
         <div class="card rounded">
           <div class="card-header">Your Currencies</div>
-          <Chart :selectedCurrencyId="selectedCurrencyIdFromChild" />
-          <Table @currency-selected="onCurrencySelected" />
+          <Chart :selectedCurrencyId="dashboardStore.selectedCurrencyId" />
+          <Table/>
         </div>
       </div>
     </div>
@@ -15,27 +15,10 @@
 <script setup>
 import Chart from '../components/Chart.vue';
 import Table from '../components/DashboardTable.vue';
-</script>
 
-<script>
-export default {
-  data() {
-    return {
-      selectedCurrencyIdFromChild: this.getSelectedCurrencyIdFromLocalStorage(),
-    };
-  },
+import { useDashboardStore } from '../stores/DashboardStore';
 
-  methods: {
-    onCurrencySelected(selectedCurrencyId) {
-      this.selectedCurrencyIdFromChild = selectedCurrencyId;
-    },
-
-    getSelectedCurrencyIdFromLocalStorage() {
-      const selectedCurrencyId = localStorage.getItem('selectedCurrencyId');
-      return selectedCurrencyId ? parseInt(selectedCurrencyId) : null;
-    },
-  },
-};
+const dashboardStore = useDashboardStore();
 </script>
 
 <style>
