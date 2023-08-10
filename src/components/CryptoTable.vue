@@ -81,7 +81,6 @@ export default {
       if (this.searchQuery.length === 0) {
         return this.sortedCurrenciesData;
       }
-
       const query = this.searchQuery.toLowerCase();
       return this.sortedCurrenciesData.filter((currencyData) =>
         currencyData.full_name.toLowerCase().includes(query)
