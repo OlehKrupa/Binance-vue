@@ -4,7 +4,7 @@
       <div class="col-md-8">
         <div class="card rounded">
           <div class="card-header">Your Currencies</div>
-          <Chart :selectedCurrencyId="dashboardStore.selectedCurrencyId" />
+          <Chart :selectedCurrencyId="parseInt(dashboardStore.selectedCurrencyId)" />
           <Table/>
         </div>
       </div>
