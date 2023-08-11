@@ -11,6 +11,7 @@ export const useDashboardStore = defineStore('dashboardStore', () => {
   const preferences = ref([]);
   const sortColumn = ref('orderIndex');
   const sortDirection = ref('asc');
+  const searchQuery = ref(null);
 
   const selectedCurrencyIdOnLocalStorage = localStorage.getItem("selectedId")
   if (selectedCurrencyIdOnLocalStorage) {
@@ -19,7 +20,7 @@ export const useDashboardStore = defineStore('dashboardStore', () => {
 
   const isPreferredCurrency = currencyId => preferences.value.includes(currencyId);
 
-  const sortedCurrenciesData = computed(() => {
+  const preferCurrenciesData = computed(() => {
     return currenciesData.value
       .slice()
       .filter(currencyData => isPreferredCurrency(currencyData.currency_id))
@@ -94,7 +95,9 @@ export const useDashboardStore = defineStore('dashboardStore', () => {
 
   return {
     loader,
-    sortedCurrenciesData,
+    currenciesData,
+    preferences,
+    preferCurrenciesData,
     selectedCurrencyId,
     sortColumn,
     sortDirection,

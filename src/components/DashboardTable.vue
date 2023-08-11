@@ -14,7 +14,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(currencyData, index) in dashboardStore.sortedCurrenciesData" :key="currencyData.currency_id"
+        <tr v-for="(currencyData, index) in dashboardStore.preferCurrenciesData" :key="currencyData.currency_id"
           :class="{ 'highlighted': dashboardStore.isSelected(currencyData.currency_id), 'selected': dashboardStore.selectedCurrencyId === currencyData.currency_id }"
           @click="dashboardStore.selectRow(currencyData.currency_id)">
           <td>{{ index + 1 }} </td>
