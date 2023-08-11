@@ -41,9 +41,8 @@ export const useDashboardStore = defineStore('dashboardStore', () => {
     loader.value = true;
     try {
       const response = await allCurrencies();
-      currenciesData.value = response.data.map((currencyData, index) => ({
+      currenciesData.value = response.data.map((currencyData) => ({
         ...currencyData,
-        orderIndex: index,
         last_sell_price: parseFloat(currencyData.last_sell_price).toFixed(2),
         price_change_percent: parseFloat(currencyData.price_change_percent).toFixed(2),
       }));
