@@ -29,7 +29,7 @@ export default {
       containerWidth: 0,
       containerHeight: 0,
       apiData: null,
-      selectedHours: 6,
+      selectedHours: 12,
       hoursOptions: [1, 6, 12, 24, 48, 72],
     };
   },

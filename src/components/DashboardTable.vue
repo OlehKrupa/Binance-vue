@@ -1,22 +1,25 @@
 <template>
-  <div class="table-container">
+  <Loader v-if="currencyStore.loader" />
+  <div v-else class="table-container">
     <table class="currency-table">
       <thead>
         <tr>
           <th class="order-header">Order</th>
-          <th @click="sort('currency_name')">Currency<span v-if="sortColumn === 'currency_name'"> {{
-            sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
-          <th @click="sort('last_sell_price')">Price<span v-if="sortColumn === 'last_sell_price'"> {{ sortDirection ===
-            'asc' ? '▲' : '▼' }}</span></th>
-          <th @click="sort('price_change_percent')">Rate<span v-if="sortColumn === 'price_change_percent'"> {{
-            sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="currencyStore.sort('currency_name')">Currency<span v-if="currencyStore.isColumnSorted('currency_name')"> {{
+            currencyStore.getSortDirection('currency_name') }}</span></th>
+          <th @click="currencyStore.sort('last_sell_price')">Price<span
+              v-if="currencyStore.isColumnSorted('last_sell_price')"> {{
+                currencyStore.getSortDirection('last_sell_price') }}</span></th>
+          <th @click="currencyStore.sort('price_change_percent')">Rate<span
+              v-if="currencyStore.isColumnSorted('price_change_percent')"> {{
+                currencyStore.getSortDirection('price_change_percent') }}</span></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(currencyData, index) in sortedCurrenciesData" :key="currencyData.currency_id"
-          :class="{ 'highlighted': isSelected(currencyData.currency_id), 'selected': selectedCurrencyId === currencyData.currency_id }"
-          @click="selectRow(currencyData.currency_id)">
-          <td>{{ index + 1 }}</td>
+        <tr v-for="(currencyData, index) in currencyStore.preferCurrenciesData" :key="currencyData.currency_id"
+          :class="{ 'highlighted': currencyStore.isSelected(currencyData.currency_id), 'selected': currencyStore.selectedCurrencyId === currencyData.currency_id }"
+          @click="currencyStore.selectRow(currencyData.currency_id)">
+          <td>{{ index + 1 }} </td>
           <td>
             <div class="currency-info">
               <img :src="currencyData.image_url" alt="currency img" class="currency-image" />
@@ -35,123 +38,11 @@
   </div>
 </template>
 
-<script>
-import { allCurrencies } from '../http/currency-api';
-import { userPreferences } from '../http/user-api';
+<script setup>
+import { useCurrencyStore } from '../stores/CurrencyStore';
+import Loader from '../components/Loader.vue';
 
-export default {
-  data() {
-    return {
-      currenciesData: [],
-      preferences: [],
-      sortColumn: 'orderIndex',
-      sortDirection: 'asc',
-      selectedCurrencyId: null,
-    };
-  },
-
-  async beforeMount() {
-    await this.fetchPreferences();
-    await this.fetchCurrencies();
-
-    const selectedCurrencyId = this.getSelectedCurrencyIdFromLocalStorage();
-
-    if (!selectedCurrencyId && this.sortedCurrenciesData.length > 0) {
-      this.selectedCurrencyId = this.sortedCurrenciesData[0].currency_id;
-      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
-    } else if (selectedCurrencyId && !this.isPreferredCurrency(selectedCurrencyId)) {
-      this.selectedCurrencyId = this.preferences.length > 0 ? this.preferences[0] : null;
-      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
-    } else {
-      this.selectedCurrencyId = selectedCurrencyId;
-    }
-  },
-
-  computed: {
-    sortedCurrenciesData() {
-      return this.currenciesData
-        .slice()
-        .filter(currencyData => this.isPreferredCurrency(currencyData.currency_id))
-        .sort((a, b) => {
-          const aValue = a[this.sortColumn];
-          const bValue = b[this.sortColumn];
-
-          if (this.sortColumn === 'last_sell_price' || this.sortColumn === 'price_change_percent') {
-            return (parseFloat(aValue) - parseFloat(bValue)) * (this.sortDirection === 'asc' ? 1 : -1);
-          } else if (this.sortColumn === 'currency_name') {
-            return aValue.localeCompare(bValue) * (this.sortDirection === 'asc' ? 1 : -1);
-          } else {
-            return (aValue - bValue) * (this.sortDirection === 'asc' ? 1 : -1);
-          }
-        });
-    },
-  },
-
-  methods: {
-    async fetchCurrencies() {
-      try {
-        const response = await allCurrencies();
-        this.currenciesData = response.data.map((currencyData, index) => ({
-          ...currencyData,
-          orderIndex: index,
-          last_sell_price: parseFloat(currencyData.last_sell_price).toFixed(2),
-          price_change_percent: parseFloat(currencyData.price_change_percent).toFixed(2),
-        }));
-      } catch (error) {
-        console.error('Error', error);
-      }
-    },
-
-    async fetchPreferences() {
-      try {
-        const response = await userPreferences();
-        this.preferences = response.data;
-      } catch (error) {
-        console.error('Error', error);
-      }
-    },
-
-    isPreferredCurrency(currencyId) {
-      return this.preferences.includes(currencyId);
-    },
-
-    sort(column) {
-      if (this.sortColumn === column) {
-        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-      } else {
-        this.sortColumn = column;
-        this.sortDirection = 'asc';
-      }
-    },
-
-    selectRow(currencyId) {
-      if (this.selectedCurrencyId === currencyId) {
-        return;
-      }
-
-      this.selectedCurrencyId = this.selectedCurrencyId === currencyId ? null : currencyId;
-      this.$emit('currency-selected', this.selectedCurrencyId); // Emit the event to the parent component
-
-      this.saveSelectedCurrencyIdToLocalStorage(this.selectedCurrencyId);
-    },
-
-    isSelected(currencyId) {
-      return this.selectedCurrencyId === currencyId;
-    },
-
-    saveSelectedCurrencyIdToLocalStorage(currencyId) {
-      localStorage.setItem('selectedCurrencyId', currencyId);
-    },
-
-    getSelectedCurrencyIdFromLocalStorage() {
-      const selectedCurrencyId = localStorage.getItem('selectedCurrencyId');
-      return selectedCurrencyId ? parseInt(selectedCurrencyId) : null;
-    },
-
-  },
-};
+const currencyStore = useCurrencyStore();
 </script>
 
-<style>
-@import url('../assets/table.css');
-</style>
+<style>@import url('../assets/table.css');</style>

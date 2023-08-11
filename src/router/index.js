@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import routes from "./routes";
 import { useAuthStore } from "../stores/auth";
+import { useCurrencyStore } from "../stores/CurrencyStore";
 
 const router = createRouter({
   routes,
@@ -20,6 +21,22 @@ router.beforeEach(async (to, from) => {
     };
   } else if (to.meta.guest && store.isLoggedIn) {
     return { name: "dashboard" };
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  const currencyStore = useCurrencyStore();
+  //remake to local var instead await
+  await currencyStore.fetchPreferences();
+  if (to.name !== "preferences" && currencyStore.preferences.length === 0) {
+    next({
+      name: "preferences",
+      query: {
+        redirect: to.fullPath,
+      },
+    });
+  } else {
+    next();
   }
 });
 
