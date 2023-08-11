@@ -60,9 +60,7 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
         try {
             const response = await userPreferences();
             preferences.value = response.data;
-
-            // Установить selectedCurrencyId как первую запись из preferences
-            if (preferences.value.length > 0) {
+            if (preferences.value.length > 0 ) {
                 selectedCurrencyId.value = preferences.value[0];
             }
         } catch (error) {
@@ -112,7 +110,7 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             return sortedCurrenciesData.value;
         }
         const query = searchQuery.value.toLowerCase();
-        return sortedCurrenciesData.value.filter((currencyData) => currencyData.currency_name.toLowerCase().includes(query));
+        return sortedCurrenciesData.value.filter((currencyData) => currencyData.full_name.toLowerCase().includes(query));
     });
 
     fetchCurrencies();
@@ -121,7 +119,7 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     watch(
         () => selectedCurrencyId,
         (state) => {
-            localStorage.setItem('selectedId', state);
+            localStorage.setItem('selectedId', state._value);
         },
         { deep: true }
     );
