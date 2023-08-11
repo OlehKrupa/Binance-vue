@@ -4,18 +4,6 @@ import NotFoundErrorPage from "../pages/errors/NotFoundErrorPage.vue";
 import DashboardPage from "../pages/DashboardPage.vue";
 import HomePage from "../pages/HomePage.vue";
 import PreferencesPage from "../pages/PreferencesPage.vue";
-
-// import { useCurrencyStore } from "../stores/CurrencyStore";
-// currencyStore = useCurrencyStore();
-
-// if (empty(currencyStore.preferences)) {
-//   routes.push({
-//     path: "/preferences",
-//     component: PreferencesPage,
-//     name: "preferences",
-//   });
-// }
-
 const routes = [
   {
     path: "/",
