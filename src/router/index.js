@@ -26,7 +26,10 @@ router.beforeEach(async (to, from) => {
 
 router.beforeEach(async (to, from, next) => {
   const currencyStore = useCurrencyStore();
+  //remake to local var instead await
+  await currencyStore.fetchPreferences();
   if (to.name !== "preferences" && currencyStore.preferences.length === 0) {
+    console.log(currencyStore.preferences);
     next({
       name: "preferences",
       query: {
