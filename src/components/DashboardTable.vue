@@ -1,22 +1,25 @@
 <template>
-  <div class="table-container">
-    <Loader v-if="useDashboardStore.loader" />
-    <table v-else class="currency-table">
+  <Loader v-if="currencyStore.loader" />
+  <div v-else class="table-container">
+    <table class="currency-table">
       <thead>
         <tr>
           <th class="order-header">Order</th>
-          <th @click="dashboardStore.sort('currency_name')">Currency<span v-if="dashboardStore.sortColumn === 'currency_name'"> {{
-            dashboardStore.sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
-          <th @click="dashboardStore.sort('last_sell_price')">Price<span v-if="dashboardStore.sortColumn === 'last_sell_price'"> {{ dashboardStore.sortDirection ===
-            'asc' ? '▲' : '▼' }}</span></th>
-          <th @click="dashboardStore.sort('price_change_percent')">Rate<span v-if="dashboardStore.sortColumn === 'price_change_percent'"> {{
-            dashboardStore.sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="currencyStore.sort('currency_name')">Currency<span
+              v-if="currencyStore.sortColumn === 'currency_name'"> {{
+                currencyStore.sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="currencyStore.sort('last_sell_price')">Price<span
+              v-if="currencyStore.sortColumn === 'last_sell_price'"> {{ currencyStore.sortDirection ===
+                'asc' ? '▲' : '▼' }}</span></th>
+          <th @click="currencyStore.sort('price_change_percent')">Rate<span
+              v-if="currencyStore.sortColumn === 'price_change_percent'"> {{
+                currencyStore.sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(currencyData, index) in dashboardStore.preferCurrenciesData" :key="currencyData.currency_id"
-          :class="{ 'highlighted': dashboardStore.isSelected(currencyData.currency_id), 'selected': dashboardStore.selectedCurrencyId === currencyData.currency_id }"
-          @click="dashboardStore.selectRow(currencyData.currency_id)">
+        <tr v-for="(currencyData, index) in currencyStore.preferCurrenciesData" :key="currencyData.currency_id"
+          :class="{ 'highlighted': currencyStore.isSelected(currencyData.currency_id), 'selected': currencyStore.selectedCurrencyId === currencyData.currency_id }"
+          @click="currencyStore.selectRow(currencyData.currency_id)">
           <td>{{ index + 1 }} </td>
           <td>
             <div class="currency-info">
@@ -36,15 +39,11 @@
   </div>
 </template>
 
-
 <script setup>
-import { useDashboardStore } from '../stores/DashboardStore';
+import { useCurrencyStore } from '../stores/CurrencyStore';
 import Loader from '../components/Loader.vue';
 
-const dashboardStore = useDashboardStore();
-
+const currencyStore = useCurrencyStore();
 </script>
 
-<style>
-@import url('../assets/table.css');
-</style>
+<style>@import url('../assets/table.css');</style>

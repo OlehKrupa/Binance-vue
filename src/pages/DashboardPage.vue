@@ -4,7 +4,7 @@
       <div class="col-md-8">
         <div class="card rounded">
           <div class="card-header">Your Currencies</div>
-          <Chart :selectedCurrencyId="parseInt(dashboardStore.selectedCurrencyId)" />
+          <Chart :selectedCurrencyId="parseInt(currencyStore.selectedCurrencyId)" />
           <Table/>
         </div>
       </div>
@@ -16,9 +16,9 @@
 import Chart from '../components/Chart.vue';
 import Table from '../components/DashboardTable.vue';
 
-import { useDashboardStore } from '../stores/DashboardStore';
+import { useCurrencyStore } from '../stores/CurrencyStore';
 
-const dashboardStore = useDashboardStore();
+const currencyStore = useCurrencyStore();
 </script>
 
 <style>
