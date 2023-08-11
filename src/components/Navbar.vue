@@ -16,7 +16,7 @@
                     </li>
                     <li class="nav-item">
                         <router-link :to="{ name: 'preferences' }" class="nav-link">Preferences</router-link>
-                    </li> 
+                    </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <template v-if="!store.isLoggedIn">
@@ -32,10 +32,13 @@
                             <a class="nav-link dropdown-toggle" :class="toggleClass" @click.prevent="toggle" href="#"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ store.user.first_name }}
-                                {{ store.user.last_name}}
+                                {{ store.user.last_name }}
                             </a>
                             <ul class="dropdown-menu" :class="toggleClass">
                                 <li><a href="#" class="dropdown-item" @click.prevent="logout">Logout</a></li>
+                                <li><a href="#" class="dropdown-item" @click.prevent="toggleSubscription">
+      {{ isSubscribe ? 'Unsubscribe' : 'Subscribe' }}
+    </a></li>
                             </ul>
                         </li>
                     </template>
@@ -46,24 +49,59 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import { userSubscribe } from '../http/user-api';
 
-const router = useRouter()
-const store = useAuthStore()
-const isOpen = ref(false)
+const router = useRouter();
+const store = useAuthStore();
+const isOpen = ref(false);
+const isSubscribe = ref(false);
+
+onMounted(() => {
+  checkSubscription();
+  const savedSubscribeStatus = localStorage.getItem('isSubscribe');
+  if (savedSubscribeStatus === 'true') {
+    isSubscribe.value = true;
+  }
+});
+
 
 const logout = async () => {
-    await store.handleLogout()
-    isOpen.value = false
-    router.push({ name: 'login' })
+  await store.handleLogout();
+  isOpen.value = false;
+  router.push({ name: 'login' });
 }
 
-const toggle = () => isOpen.value = !isOpen.value
+const toggleSubscription = async () => {
+  try {
+    if (isSubscribe.value) {
+      isSubscribe.value = false;
+      localStorage.setItem('isSubscribe', false);
+    } else {
+      isSubscribe.value = true;
+      localStorage.setItem('isSubscribe', true);
+    }
+    await userSubscribe();
+  } catch (error) {
+    console.error("Error toggling subscription:", error);
+  }
+};
 
-const toggleClass = computed(() => isOpen.value === true ? 'show' : '')
+const toggle = () => isOpen.value = !isOpen.value;
+
+const toggleClass = computed(() => isOpen.value === true ? 'show' : '');
+
+const checkSubscription = () => {
+  if (store.user && store.user.subscribed_at !== null) {
+    isSubscribe.value = true;
+  }
+};
+
 </script>
+
+
 <style scoped>
 .nav-link.router-link-active {
     color: rgba(0, 0, 0, .9);
