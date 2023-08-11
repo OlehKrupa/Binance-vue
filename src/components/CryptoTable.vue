@@ -9,8 +9,8 @@
       <thead>
         <tr>
           <th class="order-header">Order</th>
-          <th @click="currencyStore.sort('full_name')">Currency<span v-if="currencyStore.isColumnSorted('full_name')"> {{
-            currencyStore.getSortDirection('full_name') }}</span></th>
+          <th @click="currencyStore.sort('currency_name')">Currency<span v-if="currencyStore.isColumnSorted('currency_name')"> {{
+            currencyStore.getSortDirection('currency_name') }}</span></th>
           <th @click="currencyStore.sort('last_sell_price')">Price<span
               v-if="currencyStore.isColumnSorted('last_sell_price')"> {{
                 currencyStore.getSortDirection('last_sell_price') }}</span></th>
