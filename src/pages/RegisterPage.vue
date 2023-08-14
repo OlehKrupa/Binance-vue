@@ -50,6 +50,7 @@ import { reactive } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import Tr from "../i18n/translation";
 
 const router = useRouter()
 const store = useAuthStore()
@@ -66,7 +67,7 @@ const form = reactive({
 const handleSubmit = async () => {
     await handleRegister(form)
     if (isLoggedIn.value) {
-        router.push({ name: 'dashboard' })
+        router.push(Tr.i18nRoute({ name: 'dashboard' }))
     }
 }
 </script>

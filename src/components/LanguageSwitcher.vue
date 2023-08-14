@@ -1,11 +1,13 @@
 <template>
-    <select @change="switchLanguage">
+    <div class="language-select">
+      <select class="select-box" @change="switchLanguage">
         <option v-for="sLocale in supportedLocales" :key="`locale-${sLocale}`" :value="sLocale"
             :selected="locale === sLocale">
             {{ t(`locale.${sLocale}`) }}
         </option>
-    </select>
-</template>
+      </select>
+    </div>
+  </template>
 
 <script>
 import { useI18n } from 'vue-i18n';
@@ -37,3 +39,34 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.language-select {
+  display: inline-block;
+  position: relative;
+}
+
+.select-box {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.select-box:hover {
+  border-color: #666;
+}
+
+.select-box:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+</style>

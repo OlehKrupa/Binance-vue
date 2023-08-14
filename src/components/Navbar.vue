@@ -5,6 +5,7 @@
         <span>{{ $t("nav.name") }}</span>
         <strong>{{ $t("nav.strong_name") }}</strong>
       </a>
+      <LanguageSwitcher />
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -12,7 +13,8 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav" v-if="store.isLoggedIn">
           <li class="nav-item">
-            <router-link :to="Tr.i18nRoute({ name: 'dashboard' })" class="nav-link">{{ $t("nav.dashboard") }}</router-link>
+            <router-link :to="Tr.i18nRoute({ name: 'dashboard' })" class="nav-link">{{ $t("nav.dashboard")
+            }}</router-link>
           </li>
           <li class="nav-item">
             <router-link :to="Tr.i18nRoute({ name: 'preferences' })" class="nav-link">{{ $t("nav.prefs") }}</router-link>
@@ -21,10 +23,12 @@
         <ul class="navbar-nav ms-auto">
           <template v-if="!store.isLoggedIn">
             <li class="nav-item">
-              <router-link :to="Tr.i18nRoute({ name: 'login' })" class="btn btn-outline-secondary ms-2">{{ $t("nav.login") }}</router-link>
+              <router-link :to="Tr.i18nRoute({ name: 'login' })" class="btn btn-outline-secondary ms-2">{{ $t("nav.login")
+              }}</router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="Tr.i18nRoute({ name: 'register' })" class="btn btn-danger ms-2">{{ $t("nav.register") }}</router-link>
+              <router-link :to="Tr.i18nRoute({ name: 'register' })" class="btn btn-danger ms-2">{{ $t("nav.register")
+              }}</router-link>
             </li>
           </template>
           <template v-else>
@@ -45,9 +49,6 @@
         </ul>
       </div>
     </div>
-
-    <LanguageSwitcher/>
-
   </nav>
 </template>
 
@@ -87,5 +88,4 @@ const toggleClass = computed(() => isOpen.value === true ? 'show' : '');
 <style scoped>
 .nav-link.router-link-active {
   color: rgba(0, 0, 0, .9);
-}
-</style>
+}</style>
