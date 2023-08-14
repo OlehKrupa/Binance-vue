@@ -1,6 +1,10 @@
 <template>
   <Loader v-if="currencyStore.loader" />
   <div v-else class="table-container">
+    <div class="search-container">
+      <input type="text" v-model="currencyStore.searchQuery" @input="currencyStore.filterCurrencies"
+        placeholder="Search currency..." class="search-input" />
+    </div>
     <table class="currency-table">
       <thead>
         <tr>
@@ -17,9 +21,9 @@
         </tr>
       </thead>
       <tbody>
-        <TableRow v-for="(currencyData, index) in currencyStore.preferCurrenciesData" :key="currencyData.currency_id"
-          :currencyData="currencyData" :index="index" :isSelected="currencyStore.isSelected"
-          :selectedCurrencyId="currencyStore.selectedCurrencyId" :selectRow="currencyStore.selectRow" />
+        <TableRow v-for="(currencyData, index) in currencyStore.filteredCurrencies" :key="currencyData.currency_id"
+          :currencyData="currencyData" :index="index" :isSelected="currencyStore.isPreferredCurrency"
+          :selectedCurrencyId="currencyStore.selectedCurrencyId" :selectRow="currencyStore.updateUserPreferences" />
       </tbody>
     </table>
   </div>

@@ -4,7 +4,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Your Preferences</div>
-                    <CryptoTable/>
+                    <PreferencesTable/>
                 </div>
             </div>
         </div>
@@ -12,5 +12,5 @@
 </template>
 
 <script setup>
-import CryptoTable from '../components/CryptoTable.vue';
+import PreferencesTable from '../components/PreferencesTable.vue';
 </script>
