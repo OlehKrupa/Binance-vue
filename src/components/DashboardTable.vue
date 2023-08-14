@@ -4,13 +4,13 @@
     <table class="currency-table">
       <thead>
         <tr>
-          <th class="order-header">{{ $t('orderHeader') }}</th>
-          <th @click="currencyStore.sort('currency_name')">{{ $t('currencyHeader') }}<span v-if="currencyStore.isColumnSorted('currency_name')"> {{
+          <th class="order-header">Order</th>
+          <th @click="currencyStore.sort('currency_name')">Currency<span v-if="currencyStore.isColumnSorted('currency_name')"> {{
             currencyStore.getSortDirection('currency_name') }}</span></th>
-          <th @click="currencyStore.sort('last_sell_price')">{{ $t('priceHeader') }}<span
+          <th @click="currencyStore.sort('last_sell_price')">Price<span
               v-if="currencyStore.isColumnSorted('last_sell_price')"> {{
                 currencyStore.getSortDirection('last_sell_price') }}</span></th>
-          <th @click="currencyStore.sort('price_change_percent')">{{ $t('rateHeader') }}<span
+          <th @click="currencyStore.sort('price_change_percent')">Rate<span
               v-if="currencyStore.isColumnSorted('price_change_percent')"> {{
                 currencyStore.getSortDirection('price_change_percent') }}</span></th>
         </tr>
@@ -22,7 +22,7 @@
           <td>{{ index + 1 }} </td>
           <td>
             <div class="currency-info">
-              <img :src="currencyData.image_url" :alt="$t('currencyImgAlt')" class="currency-image" />
+              <img :src="currencyData.image_url" alt="currency img" class="currency-image" />
               <div class="currency-names">
                 <span>{{ currencyData.full_name }}</span>
                 <span class="short-name">{{ currencyData.currency_name }}</span>

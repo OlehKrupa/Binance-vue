@@ -3,7 +3,7 @@
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card rounded">
-          <div class="card-header">{{ $t('yourCurrenciesTitle') }}</div>
+          <div class="card-header">Your Currencies</div>
           <Chart :selectedCurrencyId="parseInt(currencyStore.selectedCurrencyId)" />
           <Table/>
         </div>

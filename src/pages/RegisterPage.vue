@@ -2,45 +2,45 @@
     <main class="auth-wrapper">
         <form class="auth-form" @submit.prevent="handleSubmit">
             <h1>
-                <span>{{ $t('binanceAppName') }}</span>
-                <strong>{{ $t('binanceVersion') }}</strong>
+                <span>Binance</span>
+                <strong>2.0</strong>
             </h1>
-            <h2 class="h3 mb-4 fw-normal">{{ $t('signUpTitle') }}</h2>
+            <h2 class="h3 mb-4 fw-normal">Please sign up</h2>
             <div class="form-floating mb-2">
-                <input type="text" class="form-control" :class="{ 'is-invalid': errors.first_name && errors.first_name[0] }" id="first_name" v-model="form.first_name" :placeholder="$t('firstNamePlaceholder')" />
-                <label for="first_name">{{ $t('firstNameLabel') }}</label>
+                <input type="text" class="form-control" :class="{ 'is-invalid': errors.first_name && errors.first_name[0] }" id="first_name" v-model="form.first_name" placeholder="Your first name" />
+                <label for="first_name">First name</label>
                 <div class="invalid-feedback" v-if="errors.first_name && errors.first_name[0]">
                     {{ errors.first_name && errors.first_name[0] }}
                 </div>
             </div>
             <div class="form-floating mb-2">
-                <input type="text" class="form-control" :class="{ 'is-invalid': errors.last_name && errors.last_name[0] }" id="last_name" v-model="form.last_name" :placeholder="$t('lastNamePlaceholder')" />
-                <label for="last_name">{{ $t('lastNameLabel') }}</label>
+                <input type="text" class="form-control" :class="{ 'is-invalid': errors.last_name && errors.last_name[0] }" id="last_name" v-model="form.last_name" placeholder="Your last name" />
+                <label for="last_name">Last name</label>
                 <div class="invalid-feedback" v-if="errors.last_name && errors.last_name[0]">
                     {{ errors.last_name && errors.last_name[0] }}
                 </div>
             </div>
             <div class="form-floating mb-2">
-                <input type="email" class="form-control" :class="{ 'is-invalid': errors.email && errors.email[0] }" id="email" v-model="form.email" :placeholder="$t('emailPlaceholder')" />
-                <label for="email">{{ $t('emailLabel') }}</label>
+                <input type="email" class="form-control" :class="{ 'is-invalid': errors.email && errors.email[0] }" id="email" v-model="form.email" placeholder="name@example.com" />
+                <label for="email">Email</label>
                 <div class="invalid-feedback" v-if="errors.email && errors.email[0]">
                     {{ errors.email && errors.email[0] }}
                 </div>
             </div>
             <div class="form-floating mb-3">
-                <input type="password" class="form-control" :class="{ 'is-invalid': errors.password && errors.password[0] }" id="password" v-model="form.password" :placeholder="$t('passwordPlaceholder')" />
-                <label for="password">{{ $t('passwordLabel') }}</label>
+                <input type="password" class="form-control" :class="{ 'is-invalid': errors.password && errors.password[0] }" id="password" v-model="form.password" placeholder="Password" />
+                <label for="password">Password</label>
                 <div class="invalid-feedback" v-if="errors.password && errors.password[0]">
                     {{ errors.password && errors.password[0] }}
                 </div>
             </div>
             <div class="form-floating mb-3">
                 <input type="password" class="form-control" id="password_confirmation" v-model="form.password_confirmation"
-                    :placeholder="$t('passwordConfirmationPlaceholder')" />
-                <label for="password_confirmation">{{ $t('passwordConfirmationLabel') }}</label>
+                    placeholder="Password Confirmation" />
+                <label for="password_confirmation">Password Confirmation</label>
             </div>
 
-            <button class="w-100 btn btn-lg btn-primary" type="submit">{{ $t('signUpButton') }}</button>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
         </form>
     </main>
 </template>

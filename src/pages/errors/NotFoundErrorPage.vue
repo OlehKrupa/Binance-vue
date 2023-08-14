@@ -1,7 +1,7 @@
 <template>
     <div class="container py-5">
-        <h1>{{ $t('errorPage.notFoundTitle') }}</h1>
-        <p>{{ $t('errorPage.notFoundMessage', { page: $route.params.notFound }) }}</p>
-        <router-link :to="{ name: 'dashboard' }">{{ $t('errorPage.backToDashboard') }}</router-link>
+        <h1>404</h1>
+        <p>Sorry, the page <code>{{  $route.params.notFound }}</code> you're looking for is not found</p>
+        <router-link :to="{ name: 'dashboard' }">Back to Dashboard</router-link>
     </div>
 </template>
