@@ -6,7 +6,6 @@ import { useCurrencyStore } from "../stores/CurrencyStore";
 const router = createRouter({
   routes,
   history: createWebHistory(),
-  // linkActiveClass: "active",
 });
 
 router.beforeEach(async (to, from) => {

@@ -1,0 +1,18 @@
+{
+    "locale":{
+        "en":"English",
+        "ua":"Ukrainian"
+    },
+
+    "nav": {
+        "name": "Binance",
+        "strong_name": "2.0",
+        "dashboard": "Dashboard",
+        "prefs": "Preferences",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "subscribe": "Subscribe",
+        "unsubscribe": "Unsubscribe"
+    }
+}
