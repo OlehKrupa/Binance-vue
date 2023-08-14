@@ -24,20 +24,22 @@ router.beforeEach(async (to, from) => {
   }
 });
 
-router.beforeEach(async (to, from, next) => {
-  const currencyStore = useCurrencyStore();
-  //remake to local var instead await
-  await currencyStore.fetchPreferences();
-  if (to.name !== "preferences" && currencyStore.preferences.length === 0) {
-    next({
-      name: "preferences",
-      query: {
-        redirect: to.fullPath,
-      },
-    });
-  } else {
-    next();
-  }
-});
+
+//fix if logout
+// router.beforeEach(async (to, from, next) => {
+//   const currencyStore = useCurrencyStore();
+//   //remake to local var instead await
+//   await currencyStore.fetchPreferences();
+//   if (to.name !== "preferences" && currencyStore.preferences.length === 0) {
+//     next({
+//       name: "preferences",
+//       query: {
+//         redirect: to.fullPath,
+//       },
+//     });
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;
