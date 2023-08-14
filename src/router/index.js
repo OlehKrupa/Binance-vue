@@ -21,6 +21,9 @@ const routes = [
         path: "home",
         component: HomePage,
         name: "home",
+        meta: {
+          guest: true,
+        },
       },
       {
         path: "dashboard",
@@ -68,33 +71,20 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const authStore = useAuthStore();
-//   await authStore.fetchUser();
-//   const currencyStore = useCurrencyStore();
-//   await currencyStore.fetchPreferences();
 
-//   if (to.meta.auth && !authStore.isLoggedIn) {
-//     next({
-//       name: "login",
+// router.beforeEach(async (to, from) => {
+//   const store = useAuthStore();
+//   await store.fetchUser();
+//   if (to.meta.auth && !store.isLoggedIn) {
+//     return {
+//       name: Tr.i18nRoute("login"),
 //       query: {
 //         redirect: to.fullPath,
 //       },
-//     });
-//   } else if (to.meta.guest && authStore.isLoggedIn) {
-//     next({ name: "dashboard" });
-//   } else if (authStore.isLoggedIn) {
-//     const currencyStore = useCurrencyStore();
-
-//     if (currencyStore.preferences.length === 0 && to.name !== "preferences") {
-//       next({ name: "preferences" });
-//     } else {
-//       next();
-//     }
-//   } else {
-//     next();
+//     };
+//   } else if (to.meta.guest && store.isLoggedIn) {
+//     return { name: Tr.i18nRoute("dashboard") };
 //   }
-// });
-
+// });   
 
 export default router;
