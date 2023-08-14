@@ -12,6 +12,25 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     const sortDirection = ref('asc');
     const searchQuery = ref('');
 
+    //1 minute
+    const fetchInterval = 1 * 60 * 1000;
+
+    const manualFetchData = async () => {
+        console.log("manual");
+        if (currenciesData.value.length === 0) {
+            await fetchCurrencies();
+        }
+        if (preferences.value.length === 0) {
+            await fetchPreferences();
+        }
+    }
+
+    const fetchData = async () => {
+        console.log("fetchData");
+        await fetchCurrencies();
+        await fetchPreferences();
+    }
+
     const selectedCurrencyIdOnLocalStorage = localStorage.getItem('selectedId');
     if (selectedCurrencyIdOnLocalStorage) {
         selectedCurrencyId.value = parseInt(selectedCurrencyIdOnLocalStorage);
@@ -60,9 +79,23 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
         try {
             const response = await userPreferences();
             preferences.value = response.data;
-            if (preferences.value.length > 0 ) {
+            if (preferences.value.length > 0) {
                 selectedCurrencyId.value = preferences.value[0];
             }
+        } catch (error) {
+            console.error('Error', error);
+        }
+    };
+
+    const updateUserPreferences = async (currencyId) => {
+        try {
+            if (isPreferredCurrency(currencyId)) {
+                preferences.value = preferences.value.filter((pref) => pref !== currencyId);
+            } else {
+                preferences.value.push(currencyId);
+            }
+            const selectedCurrencies = preferences.value;
+            await userPreferencesUpdate({ selectedCurrencies });
         } catch (error) {
             console.error('Error', error);
         }
@@ -87,20 +120,6 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
 
     const isSelected = (currencyId) => selectedCurrencyId.value === currencyId;
 
-    const updateUserPreferences = async (currencyId) => {
-        try {
-            if (isPreferredCurrency(currencyId)) {
-                preferences.value = preferences.value.filter((pref) => pref !== currencyId);
-            } else {
-                preferences.value.push(currencyId);
-            }
-            const selectedCurrencies = preferences.value;
-            await userPreferencesUpdate({ selectedCurrencies });
-        } catch (error) {
-            console.error('Error', error);
-        }
-    };
-
     const isColumnSorted = (column) => sortColumn.value === column;
 
     const getSortDirection = (column) => (sortColumn.value === column ? (sortDirection.value === 'asc' ? '▲' : '▼') : '');
@@ -113,9 +132,6 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
         return sortedCurrenciesData.value.filter((currencyData) => currencyData.full_name.toLowerCase().includes(query));
     });
 
-    fetchCurrencies();
-    fetchPreferences();
-
     watch(
         () => selectedCurrencyId,
         (state) => {
@@ -123,6 +139,9 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
         },
         { deep: true }
     );
+
+    manualFetchData();
+    setInterval(fetchData, fetchInterval);
 
     return {
         loader,
