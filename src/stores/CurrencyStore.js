@@ -16,7 +16,6 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     const fetchInterval = 1 * 60 * 1000;
 
     const manualFetchData = async () => {
-        console.log("manual");
         if (currenciesData.value.length === 0) {
             await fetchCurrencies();
         }
@@ -26,7 +25,6 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     }
 
     const fetchData = async () => {
-        console.log("fetchData");
         await fetchCurrencies();
         await fetchPreferences();
     }
