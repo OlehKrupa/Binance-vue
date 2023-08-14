@@ -8,6 +8,7 @@ const router = createRouter({
   history: createWebHistory(),
 });
 
+//infinite redirect
 router.beforeEach(async (to, from) => {
   const store = useAuthStore();
   await store.fetchUser();
@@ -22,7 +23,6 @@ router.beforeEach(async (to, from) => {
     return { name: "dashboard" };
   }
 });
-
 
 //fix if logout
 // router.beforeEach(async (to, from, next) => {
