@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import routes from "./routes";
 import { useAuthStore } from "../stores/auth";
 import { useCurrencyStore } from "../stores/CurrencyStore";
+import { Tr } from "../i18n/translation"
 
 const router = createRouter({
   routes,
@@ -9,6 +10,7 @@ const router = createRouter({
 });
 
 //infinite redirect
+//редирект на локаль/dashboard а не /dashboard
 router.beforeEach(async (to, from) => {
   const store = useAuthStore();
   await store.fetchUser();
@@ -20,7 +22,12 @@ router.beforeEach(async (to, from) => {
       },
     };
   } else if (to.meta.guest && store.isLoggedIn) {
-    return { name: "dashboard" };
+    return {
+      name: "dashboard", 
+      query: {
+        redirect: to.fullPath,
+      },
+    };
   }
 });
 

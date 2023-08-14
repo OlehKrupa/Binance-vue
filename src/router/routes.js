@@ -22,11 +22,17 @@ const routes = [
         path: "dashboard",
         component: DashboardPage,
         name: "dashboard",
+        meta: {
+          auth: true,
+        },
       },
       {
         path: "preferences",
         component: PreferencesPage,
         name: "preferences",
+        meta: {
+          auth: true,
+        },
       },
       {
         path: "login",
