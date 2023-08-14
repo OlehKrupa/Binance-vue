@@ -68,4 +68,33 @@ const router = createRouter({
   routes,
 });
 
+// router.beforeEach(async (to, from, next) => {
+//   const authStore = useAuthStore();
+//   await authStore.fetchUser();
+//   const currencyStore = useCurrencyStore();
+//   await currencyStore.fetchPreferences();
+
+//   if (to.meta.auth && !authStore.isLoggedIn) {
+//     next({
+//       name: "login",
+//       query: {
+//         redirect: to.fullPath,
+//       },
+//     });
+//   } else if (to.meta.guest && authStore.isLoggedIn) {
+//     next({ name: "dashboard" });
+//   } else if (authStore.isLoggedIn) {
+//     const currencyStore = useCurrencyStore();
+
+//     if (currencyStore.preferences.length === 0 && to.name !== "preferences") {
+//       next({ name: "preferences" });
+//     } else {
+//       next();
+//     }
+//   } else {
+//     next();
+//   }
+// });
+
+
 export default router;
