@@ -2,8 +2,8 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container py-2">
       <a class="navbar-brand">
-        <span>Binance</span>
-        <strong>2.0</strong>
+        <span>{{ $t("binanceAppName") }}</span>
+        <strong>{{ $t("binanceVersion") }}</strong>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,19 +12,19 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav" v-if="store.isLoggedIn">
           <li class="nav-item">
-            <router-link :to="{ name: 'dashboard' }" class="nav-link">Dashboard</router-link>
+            <router-link :to="{ name: 'dashboard' }" class="nav-link">{{ $t('dashboardLink') }}</router-link>
           </li>
           <li class="nav-item">
-            <router-link :to="{ name: 'preferences' }" class="nav-link">Preferences</router-link>
+            <router-link :to="{ name: 'preferences' }" class="nav-link">{{ $t('preferencesLink') }}</router-link>
           </li>
         </ul>
         <ul class="navbar-nav ms-auto">
           <template v-if="!store.isLoggedIn">
             <li class="nav-item">
-              <router-link :to="{ name: 'login' }" class="btn btn-outline-secondary ms-2">Login</router-link>
+              <router-link :to="{ name: 'login' }" class="btn btn-outline-secondary ms-2">{{ $t('loginButton') }}</router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'register' }" class="btn btn-danger ms-2">Register</router-link>
+              <router-link :to="{ name: 'register' }" class="btn btn-danger ms-2">{{ $t('registerButton') }}</router-link>
             </li>
           </template>
           <template v-else>
@@ -35,9 +35,9 @@
                 {{ store.user.last_name }}
               </a>
               <ul class="dropdown-menu" :class="toggleClass">
-                <li><a href="#" class="dropdown-item" @click.prevent="logout">Logout</a></li>
+                <li><a href="#" class="dropdown-item" @click.prevent="logout">{{ $t('logoutButton') }}</a></li>
                 <li><a href="#" class="dropdown-item" @click.prevent="toggleSubscription">
-                    {{ store.isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
+                    {{ store.isSubscribed ? $t('unsubscribeButton') : $t('subscribeButton') }}
                   </a></li>
               </ul>
             </li>
