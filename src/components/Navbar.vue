@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed} from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { userSubscribe } from '../http/user-api';
@@ -63,7 +63,8 @@ const logout = async () => {
   await store.handleLogout();
   isOpen.value = false;
   router.push({ name: 'login' });
-}
+};
+
 const toggleSubscription = async () => {
   try {
     isSubscribed=!isSubscribed;

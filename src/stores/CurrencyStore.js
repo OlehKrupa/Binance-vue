@@ -11,8 +11,12 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     const sortColumn = ref('orderIndex');
     const sortDirection = ref('asc');
     const searchQuery = ref('');
+    
+    //Заглушка
     const premium = ref(false);
-    //const showModal = ref(false);
+
+    const showZeroModal = ref(false);
+    const showPremiumModal = ref(false);
 
     //1 minute
     const fetchInterval = 1 * 60 * 1000;
@@ -81,10 +85,9 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             preferences.value = response.data;
             if (preferences.value.length > 0) {
                 selectedCurrencyId.value = preferences.value[0];
+            } else {
+                showZeroModal.value=true;
             }
-            //else {
-            //     showModal.value = true;
-            // }
         } catch (error) {
             console.error('Error', error);
         }
@@ -95,17 +98,19 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             if (isPreferredCurrency(currencyId)) {
                 preferences.value = preferences.value.filter((pref) => pref !== currencyId);
             } else {
-                console.log(premium.value);
                 if (premium.value) {
                     preferences.value.push(currencyId);
                 }
-                if ((preferences.value.length > 3) && (!premium.value)) {
-                    //showModal.value = true;
+                if ((preferences.value.length >= 4) && (!premium.value)) {
+                    showPremiumModal.value=true;
                 } else {
                     preferences.value.push(currencyId);
                 }
             }
             const selectedCurrencies = preferences.value;
+            if (selectedCurrencies.length === 0){
+                showZeroModal.value=true;
+            }
             await userPreferencesUpdate({ selectedCurrencies });
         } catch (error) {
             console.error('Error', error);
@@ -152,11 +157,12 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     );
 
     manualFetchData();
-    setInterval(fetchData, fetchInterval);
+    //setInterval(fetchData, fetchInterval);
 
     return {
         loader,
-        //showModal,
+        showZeroModal,
+        showPremiumModal,
         currenciesData,
         preferences,
         preferCurrenciesData,

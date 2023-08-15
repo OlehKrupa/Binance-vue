@@ -7,15 +7,15 @@ export const useAuthStore = defineStore("authStore", () => {
   const errors = ref({});
   const isSubscribed = ref(false);
 
+  //Заглушка
+  const premium = ref(false);
+
   const isLoggedIn = computed(() => !!user.value);
 
   const fetchUser = async () => {
     try {
       const { data } = await getUser();
       user.value = data;
-
-      console.log(user.value.subscribed_at);
-
       if (user.value.subscribed_at) {
         isSubscribed.value = true;
       }
