@@ -29,7 +29,7 @@ router.beforeEach(async (to, from, next) => {
   await store.fetchUser();
   const currencyStore = useCurrencyStore();
   await currencyStore.fetchPreferences();
-  if ((to.name !== "preferences") && (currencyStore.preferences.length === 0)  && (store.isLoggedIn)) {
+  if ((to.name !== "preferences") && (currencyStore.preferences.length === 0) && (store.isLoggedIn)) {
     next({
       name: "preferences",
       query: {

@@ -11,6 +11,8 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     const sortColumn = ref('orderIndex');
     const sortDirection = ref('asc');
     const searchQuery = ref('');
+    const premium = ref(false);
+    //const showModal = ref(false);
 
     //1 minute
     const fetchInterval = 1 * 60 * 1000;
@@ -80,6 +82,9 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             if (preferences.value.length > 0) {
                 selectedCurrencyId.value = preferences.value[0];
             }
+            //else {
+            //     showModal.value = true;
+            // }
         } catch (error) {
             console.error('Error', error);
         }
@@ -90,7 +95,15 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             if (isPreferredCurrency(currencyId)) {
                 preferences.value = preferences.value.filter((pref) => pref !== currencyId);
             } else {
-                preferences.value.push(currencyId);
+                console.log(premium.value);
+                if (premium.value) {
+                    preferences.value.push(currencyId);
+                }
+                if ((preferences.value.length > 3) && (!premium.value)) {
+                    //showModal.value = true;
+                } else {
+                    preferences.value.push(currencyId);
+                }
             }
             const selectedCurrencies = preferences.value;
             await userPreferencesUpdate({ selectedCurrencies });
@@ -143,12 +156,15 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
 
     return {
         loader,
+        //showModal,
         currenciesData,
         preferences,
         preferCurrenciesData,
         selectedCurrencyId,
         sortColumn,
         sortDirection,
+        filteredCurrencies,
+        searchQuery,
         isPreferredCurrency,
         fetchCurrencies,
         fetchPreferences,
@@ -158,7 +174,5 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
         updateUserPreferences,
         isColumnSorted,
         getSortDirection,
-        filteredCurrencies,
-        searchQuery,
     };
 });

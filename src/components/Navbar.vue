@@ -37,7 +37,7 @@
               <ul class="dropdown-menu" :class="toggleClass">
                 <li><a href="#" class="dropdown-item" @click.prevent="logout">Logout</a></li>
                 <li><a href="#" class="dropdown-item" @click.prevent="toggleSubscription">
-                    {{ store.isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
+                    {{ isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
                   </a></li>
               </ul>
             </li>
@@ -57,6 +57,7 @@ import { userSubscribe } from '../http/user-api';
 const router = useRouter();
 const store = useAuthStore();
 const isOpen = ref(false);
+let isSubscribed = ref(store.isSubscribed);
 
 const logout = async () => {
   await store.handleLogout();
@@ -65,6 +66,7 @@ const logout = async () => {
 }
 const toggleSubscription = async () => {
   try {
+    isSubscribed=!isSubscribed;
     await userSubscribe();
   } catch (error) {
     console.error("Error toggling subscription:", error);

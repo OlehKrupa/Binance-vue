@@ -14,6 +14,8 @@ export const useAuthStore = defineStore("authStore", () => {
       const { data } = await getUser();
       user.value = data;
 
+      console.log(user.value.subscribed_at);
+
       if (user.value.subscribed_at) {
         isSubscribed.value = true;
       }
