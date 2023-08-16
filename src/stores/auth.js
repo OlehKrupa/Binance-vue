@@ -5,10 +5,9 @@ import { csrfCookie, login, register, logout, getUser } from "../http/auth-api";
 export const useAuthStore = defineStore("authStore", () => {
   const user = ref(null);
   const errors = ref({});
-  const isSubscribed = ref(false);
 
-  //Заглушка
-  const premium = ref(false);
+  const isSubscribed = computed(() => user.value && user.value.subscribed_at);
+  const isPremium = computed(() => user.value && user.value.premium_at);
 
   const isLoggedIn = computed(() => !!user.value);
 
@@ -16,12 +15,6 @@ export const useAuthStore = defineStore("authStore", () => {
     try {
       const { data } = await getUser();
       user.value = data;
-      if (user.value.subscribed_at) {
-        isSubscribed.value = true;
-      }
-      else {
-        isSubscribed.value = false;
-      }
     } catch (error) {
       user.value = null;
     }
@@ -65,6 +58,7 @@ export const useAuthStore = defineStore("authStore", () => {
     errors,
     isLoggedIn,
     isSubscribed,
+    isPremium,
     fetchUser,
     handleLogin,
     handleRegister,
