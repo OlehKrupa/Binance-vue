@@ -3,7 +3,11 @@ import { allCurrencies } from '../http/currency-api';
 import { userPreferences, userPreferencesUpdate } from '../http/user-api';
 import { ref, computed, watch } from 'vue';
 
+import { useAuthStore } from './auth';
+
 export const useCurrencyStore = defineStore('currencyStore', () => {
+    const authStore = useAuthStore();
+
     const loader = ref(false);
     const currenciesData = ref([]);
     const selectedCurrencyId = ref(0);
@@ -98,10 +102,10 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             if (isPreferredCurrency(currencyId)) {
                 preferences.value = preferences.value.filter((pref) => pref !== currencyId);
             } else {
-                if (premium.value) {
+                if (authStore.isPremium!=null) {
                     preferences.value.push(currencyId);
                 }
-                if ((preferences.value.length >= 4) && (!premium.value)) {
+                if ((preferences.value.length >= 4) && (authStore.isPremium===null)) {
                     showPremiumModal.value=true;
                 } else {
                     preferences.value.push(currencyId);
