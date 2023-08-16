@@ -6,6 +6,7 @@
           <div class="card-header">Your Currencies</div>
           <Chart :selectedCurrencyId="parseInt(currencyStore.selectedCurrencyId)" />
           <Table/>
+          <News/>
         </div>
       </div>
     </div>
@@ -15,6 +16,7 @@
 <script setup>
 import Chart from '../components/Chart.vue';
 import Table from '../components/DashboardTable.vue';
+import News from '../components/NewsList.vue';
 
 import { useCurrencyStore } from '../stores/CurrencyStore';
 
