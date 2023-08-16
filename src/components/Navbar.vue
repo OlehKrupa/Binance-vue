@@ -33,12 +33,18 @@
                 data-bs-toggle="dropdown" aria-expanded="false">
                 {{ store.user.first_name }}
                 {{ store.user.last_name }}
+                <span class="subscription-label" v-if="store.isPremium || store.isSubscribed">
+                  {{ store.isPremium ? '★' : '' }}
+                </span>
+
               </a>
               <ul class="dropdown-menu" :class="toggleClass">
                 <li><a href="#" class="dropdown-item" @click.prevent="logout">Logout</a></li>
-                <li><a href="#" class="dropdown-item" @click.prevent="toggleSubscription">
-                    {{ isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
-                  </a></li>
+                <li>
+                  <a href="#" class="dropdown-item" @click.prevent="toggleSubscription">
+                    {{ store.isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
+                  </a>
+                </li>
               </ul>
             </li>
           </template>
@@ -49,15 +55,15 @@
 </template>
 
 <script setup>
-import { ref, computed} from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { userSubscribe } from '../http/user-api';
 
 const router = useRouter();
+
 const store = useAuthStore();
 const isOpen = ref(false);
-let isSubscribed = ref(store.isSubscribed);
 
 const logout = async () => {
   await store.handleLogout();
@@ -67,8 +73,8 @@ const logout = async () => {
 
 const toggleSubscription = async () => {
   try {
-    isSubscribed=!isSubscribed;
     await userSubscribe();
+    await store.fetchUser();
   } catch (error) {
     console.error("Error toggling subscription:", error);
   }
@@ -84,5 +90,10 @@ const toggleClass = computed(() => isOpen.value === true ? 'show' : '');
 <style scoped>
 .nav-link.router-link-active {
   color: rgba(0, 0, 0, .9);
+}
+
+.subscription-label {
+  color: gold;
+  font-size: 1.2rem;
 }
 </style>
