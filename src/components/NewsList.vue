@@ -1,24 +1,27 @@
 <template>
   <div class="news-container">
-    <h2 class="news-title">News</h2>
     <Loader v-if="newsStore.loader" />
-    <div v-else class="news-row" v-for="(row, index) in rows" :key="index">
+    <div v-else class="news-row" v-for="(row, index) in visibleRows" :key="index">
       <NewsComponent
         v-for="newsItem in row"
         :key="newsItem.id"
         :newsItem="newsItem"
       />
     </div>
+    <button v-if="showMoreButton" @click="loadMoreNews" class="show-more-button">Show more</button>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useNewsStore } from '../stores/NewsStore';
 import Loader from '../components/Loader.vue'
 import NewsComponent from './NewsComponent.vue';
 
 const newsStore = useNewsStore();
+const rowsToShow = ref(1);
+const visibleRows = computed(() => rows.value.slice(0, rowsToShow.value));
+const showMoreButton = computed(() => rowsToShow.value < rows.value.length);
 
 const rows = computed(() => {
   const sortedNewsData = [...newsStore.newsData].sort((a, b) => {
@@ -31,6 +34,10 @@ const rows = computed(() => {
   }
   return computedRows;
 });
+
+function loadMoreNews() {
+  rowsToShow.value ++;
+}
 </script>
 
 <style scoped>
@@ -48,14 +55,31 @@ const rows = computed(() => {
 
 .news-row {
   width: 100%;
+  padding-inline: 20px;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  flex-direction: column;
 }
 
-@media (max-width: 800px) {
+/* @media (max-width: 1000px) {
   .news-row {
     flex-direction: column;
   }
+} */
+
+.show-more-button {
+  margin: 10px auto;
+  display: block;
+  padding: 10px 30px;
+  font-size: 16px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.show-more-button:hover {
+  background-color: #0056b3;
 }
 </style>

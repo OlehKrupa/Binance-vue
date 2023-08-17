@@ -52,10 +52,10 @@ export default {
   
 <style scoped>
 .news-item {
-  width: 50%;
+  width: 100%;
   height: 150px;
-  margin-inline: 10px;
-  padding: 10px;
+  margin-inline-end: 10px ;
+  padding-block: 10px;
   cursor: pointer;
   display: flex;
 }
