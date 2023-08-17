@@ -2,20 +2,22 @@
   <div class="news-item" @click="redirectToSource">
     <div class="news-content">
       <div class="news-image-container">
-        <img :src="newsItem.imageUrl" alt="News Image" class="news-image" />
+        <img :src="newsItem.image" alt="News Image" class="news-image" />
       </div>
       <div class="news-details">
         <div class="news-meta">
-          {{ formatDate(newsItem.published_at) }} | {{ extractDomain(newsItem.source) }}
+          {{ formatDate(newsItem.published_at) }} | {{ extractDomain(newsItem.source) }} | {{ newsItem.category }}
         </div>
-        <h5>{{ newsItem.title }}</h5>
-        <p class="news-content-text">{{ newsItem.content }}</p>
+        <h6 v-html="decodeHTML(newsItem.title)"></h6>
+        <p class="news-content-text" v-html="decodeHTML(newsItem.content)"></p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import he from 'he';
+
 export default {
   props: {
     newsItem: {
@@ -41,6 +43,9 @@ export default {
       }
       return url;
     },
+    decodeHTML(html) {
+      return he.decode(html);
+    },
   },
 };
 </script>
@@ -61,7 +66,7 @@ export default {
 }
 
 .news-image-container {
-  width: 30%;
+  width: 35%;
   height: 100%;
   overflow: hidden;
 }
