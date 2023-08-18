@@ -6,9 +6,9 @@
                 <button v-if="showOKButton" @click="closeModal" class="btn btn-success mr-2">
                     OK
                 </button>
-                <button v-if="showPaymentButton" @click="goToPayment" class="btn btn-warning">
+                <router-link v-if="showPaymentButton" :to="{ name: 'payment' }" class="btn btn-warning">
                     Go to Payment
-                </button>
+                </router-link>
             </div>
         </div>
     </div>
@@ -17,8 +17,10 @@
 <script setup>
 import { useCurrencyStore } from '../stores/CurrencyStore';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router'; // Import the useRouter function
 
 const currencyStore = useCurrencyStore();
+const router = useRouter(); // Initialize the router
 
 const modalMessage = ref('');
 const showOKButton = ref(true);
@@ -35,6 +37,7 @@ const closeModal = () => {
 const goToPayment = () => {
     closeModal();
     console.log("Go to payment");
+    router.push({ name: 'payment' });
 };
 </script>
   
@@ -57,4 +60,4 @@ const goToPayment = () => {
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-</style>  
+</style>

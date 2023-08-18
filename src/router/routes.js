@@ -4,6 +4,8 @@ import NotFoundErrorPage from "../pages/errors/NotFoundErrorPage.vue";
 import DashboardPage from "../pages/DashboardPage.vue";
 import HomePage from "../pages/HomePage.vue";
 import PreferencesPage from "../pages/PreferencesPage.vue";
+import PaymentPage from "../pages/PaymentPage.vue"
+
 const routes = [
   {
     path: "/",
@@ -14,6 +16,11 @@ const routes = [
     path: "/dashboard",
     component: DashboardPage,
     name: "dashboard",
+  },
+  {
+    path: "/payment",
+    component: PaymentPage,
+    name: "payment",
   },
   {
     path: "/preferences",
