@@ -17,10 +17,10 @@
 <script setup>
 import { useCurrencyStore } from '../stores/CurrencyStore';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router'; // Import the useRouter function
+import { useRouter } from 'vue-router';
 
 const currencyStore = useCurrencyStore();
-const router = useRouter(); // Initialize the router
+const router = useRouter();
 
 const modalMessage = ref('');
 const showOKButton = ref(true);
@@ -34,11 +34,6 @@ const closeModal = () => {
     currencyStore.showPremiumModal = false;
 };
 
-const goToPayment = () => {
-    closeModal();
-    console.log("Go to payment");
-    router.push({ name: 'payment' });
-};
 </script>
   
 <style scoped>

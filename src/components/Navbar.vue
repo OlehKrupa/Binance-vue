@@ -33,7 +33,7 @@
                 data-bs-toggle="dropdown" aria-expanded="false">
                 {{ store.user.first_name }}
                 {{ store.user.last_name }}
-                <span class="subscription-label" v-if="store.isPremium || store.isSubscribed">
+                <span class="subscription-label" v-if="store.isPremium">
                   {{ store.isPremium ? '★' : '' }}
                 </span>
 
@@ -44,6 +44,9 @@
                   <a href="#" class="dropdown-item" @click.prevent="toggleSubscription">
                     {{ store.isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
                   </a>
+                </li>
+                <li v-if="store.isPremium">
+                  <a href="#" class="dropdown-item" @click.prevent="store.handleCancelPremium">Unpremium</a>
                 </li>
               </ul>
             </li>
