@@ -9,5 +9,3 @@ export const register = (user) => api.post("/api/register", user);
 export const logout = () => api.post("/api/logout");
 
 export const getUser = () => api.get("/api/user");
-
-export const unPremium = () => api.patch("/api/user/unpremium");

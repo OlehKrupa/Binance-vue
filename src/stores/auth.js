@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { csrfCookie, login, register, logout, getUser, unPremium } from "../http/auth-api";
-import { now } from "d3";
+import { csrfCookie, login, register, logout, getUser } from "../http/auth-api";
+import { unPremium } from "../http/user-api";
 
 export const useAuthStore = defineStore("authStore", () => {
   const user = ref(null);
