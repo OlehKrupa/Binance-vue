@@ -1,7 +1,11 @@
 import { ref } from 'vue';
-import { getPaymentSession } from '../http/user-api';
+import { getPaymentSession, unStripe } from '../http/user-api';
+
+import { useAuthStore } from './auth';
 
 export function usePaymentStore() {
+  const authStore = useAuthStore();
+
   const loading = ref(true);
   const sessionSubId = ref(null);
   const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
@@ -18,11 +22,17 @@ export function usePaymentStore() {
     }
   };
 
+  const handleCancelPremium = async () => {
+    unStripe();
+    authStore.fetchUser();
+  }
+
   getSession();
 
   return {
     sessionSubId,
     publishableKey,
     loading,
+    handleCancelPremium,
   };
 }
