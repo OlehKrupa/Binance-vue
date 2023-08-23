@@ -10,7 +10,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav" v-if="store.isLoggedIn">
+        <ul class="navbar-nav" v-if="authStore.isLoggedIn">
           <li class="nav-item">
             <router-link :to="{ name: 'dashboard' }" class="nav-link">Dashboard</router-link>
           </li>
@@ -19,7 +19,7 @@
           </li>
         </ul>
         <ul class="navbar-nav ms-auto">
-          <template v-if="!store.isLoggedIn">
+          <template v-if="!authStore.isLoggedIn">
             <li class="nav-item">
               <router-link :to="{ name: 'login' }" class="btn btn-outline-secondary ms-2">Login</router-link>
             </li>
@@ -31,10 +31,10 @@
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" :class="toggleClass" @click.prevent="toggle" href="#" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                {{ store.user.first_name }}
-                {{ store.user.last_name }}
-                <span class="subscription-label" v-if="store.isPremium || store.isSubscribed">
-                  {{ store.isPremium ? '★' : '' }}
+                {{ authStore.user.first_name }}
+                {{ authStore.user.last_name }}
+                <span class="subscription-label" v-if="authStore.isPremium">
+                  {{ authStore.isPremium ? '★' : '' }}
                 </span>
 
               </a>
@@ -42,8 +42,11 @@
                 <li><a href="#" class="dropdown-item" @click.prevent="logout">Logout</a></li>
                 <li>
                   <a href="#" class="dropdown-item" @click.prevent="toggleSubscription">
-                    {{ store.isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
+                    {{ authStore.isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
                   </a>
+                </li>
+                <li v-if="authStore.isPremium">
+                  <a href="#" class="dropdown-item" @click.prevent="paymentStore.handleCancelPremium">Cancel premium pay</a>
                 </li>
               </ul>
             </li>
@@ -57,16 +60,18 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+const router = useRouter();
 import { useAuthStore } from "../stores/auth";
+import { usePaymentStore } from "../stores/PaymentStore";
 import { userSubscribe } from '../http/user-api';
 
-const router = useRouter();
+const authStore = useAuthStore();
+const paymentStore = usePaymentStore();
 
-const store = useAuthStore();
 const isOpen = ref(false);
 
 const logout = async () => {
-  await store.handleLogout();
+  await authStore.handleLogout();
   isOpen.value = false;
   router.push({ name: 'login' });
 };
@@ -74,7 +79,7 @@ const logout = async () => {
 const toggleSubscription = async () => {
   try {
     await userSubscribe();
-    await store.fetchUser();
+    await authStore.fetchUser();
   } catch (error) {
     console.error("Error toggling subscription:", error);
   }

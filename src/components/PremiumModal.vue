@@ -1,40 +1,59 @@
 <template>
-    <div v-if="currencyStore.showPremiumModal" class="modal">
+    <div class="modal">
         <div class="modal-content">
             <p>{{ modalMessage }}</p>
             <div class="d-flex justify-content-center">
                 <button v-if="showOKButton" @click="closeModal" class="btn btn-success mr-2">
                     OK
                 </button>
-                <button v-if="showPaymentButton" @click="goToPayment" class="btn btn-warning">
-                    Go to Payment
-                </button>
+                <stripe-checkout v-if="!paymentStore.loading.value" ref="checkoutSubRef" :pk="paymentStore.publishableKey"
+                    :sessionId="paymentStore.sessionSubId.value" />
+                <!-- <div class="loader-container" v-if="paymentStore.loading.value">
+                    <Loader class="loader" />
+                </div> -->
+                <button class="btn btn-primary" @click="submit">Subscribe</button>
             </div>
         </div>
     </div>
 </template>
   
 <script setup>
+import { StripeCheckout } from '@vue-stripe/vue-stripe';
 import { useCurrencyStore } from '../stores/CurrencyStore';
+import { usePaymentStore } from '../stores/PaymentStore';
 import { ref } from 'vue';
+// import Loader from '../components/LoaderMini.vue';
 
 const currencyStore = useCurrencyStore();
 
-const modalMessage = ref('');
+const modalMessage = ref('Consider upgrading to a premium subscription to track more cryptocurrencies.');
 const showOKButton = ref(true);
-const showPaymentButton = ref(false);
 
-modalMessage.value = 'Consider upgrading to a premium subscription to track more cryptocurrencies.';
-showOKButton.value = true;
-showPaymentButton.value = true;
+const paymentStore = usePaymentStore();
 
-const closeModal = () => {
-    currencyStore.showPremiumModal = false;
+const checkoutSubRef = ref(null);
+
+const submit = async () => {
+    await paymentStore.getSession();
+    if (checkoutSubRef.value) {
+        checkoutSubRef.value.redirectToCheckout();
+    } else {
+        console.error('checkoutSubRef is not available.');
+    }
 };
 
-const goToPayment = () => {
-    closeModal();
-    console.log("Go to payment");
+const closeModal = () => {
+    try {
+        currencyStore.showPremiumModal = false;
+    } catch (e) {
+        if (e instanceof Stripe.CardException) {
+            console.error("A payment error occurred: " + e.getError().message);
+        } else if (e instanceof Stripe.InvalidRequestException) {
+            console.error("An invalid request occurred.");
+        } else {
+            console.error("Another problem occurred, maybe unrelated to Stripe.");
+        }
+    }
 };
 </script>
   
@@ -57,4 +76,17 @@ const goToPayment = () => {
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-</style>  
+
+.loader-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.loader {
+    height: 100%;
+    width: 100%;
+}
+</style>
+  

@@ -4,6 +4,7 @@ import NotFoundErrorPage from "../pages/errors/NotFoundErrorPage.vue";
 import DashboardPage from "../pages/DashboardPage.vue";
 import HomePage from "../pages/HomePage.vue";
 import PreferencesPage from "../pages/PreferencesPage.vue";
+
 const routes = [
   {
     path: "/",

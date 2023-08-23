@@ -4,8 +4,8 @@
         <div class="col-md-8">
           <div class="card">
             <div class="card-header">Your Preferences</div>
-            <PremiumModal/>
-            <ZeroModal/>
+            <PremiumModal v-if="currencyStore.showPremiumModal"/>
+            <ZeroModal v-if="currencyStore.showZeroModal"/>
             <PreferencesTable />
           </div>
         </div>
@@ -17,5 +17,8 @@
   import PreferencesTable from '../components/PreferencesTable.vue';
   import PremiumModal from '../components/PremiumModal.vue';
   import ZeroModal from '../components/ZeroModal.vue';
+  import { useCurrencyStore } from '../stores/CurrencyStore';
+
+  const currencyStore = useCurrencyStore();
   </script>
   
