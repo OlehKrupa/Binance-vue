@@ -10,8 +10,6 @@ export const userPreferencesUpdate = (selectedCurrencies) => api.put(`${resource
 
 export const userSubscribe = () => api.patch(`${resource}/subscribe`);
 
-export const unPremium = () => api.patch(`${resource}/unpremium`);
-
 export const unStripe = () => api.get(`${resource}/unstripe`);
 
 export const getPaymentSession = () => api.get(`${resource}/getSession`);
