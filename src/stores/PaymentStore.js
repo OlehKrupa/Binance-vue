@@ -11,7 +11,6 @@ export function usePaymentStore() {
     try {
       const res = await getPaymentSession();
       sessionSubId.value = res.data.sub.id;
-      console.log(sessionSubId.value);
     } catch (err) {
       console.log(err);
     } finally {
