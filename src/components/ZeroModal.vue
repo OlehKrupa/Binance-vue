@@ -1,5 +1,5 @@
 <template>
-    <div v-if="currencyStore.showZeroModal" class="modal">
+    <div class="modal">
         <div class="modal-content">
             <p>{{ modalMessage }}</p>
             <div class="d-flex justify-content-center">

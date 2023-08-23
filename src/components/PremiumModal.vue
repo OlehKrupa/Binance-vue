@@ -1,19 +1,17 @@
 <template>
-    <div v-if="currencyStore.showPremiumModal" class="modal">
+    <div class="modal">
         <div class="modal-content">
             <p>{{ modalMessage }}</p>
             <div class="d-flex justify-content-center">
                 <button v-if="showOKButton" @click="closeModal" class="btn btn-success mr-2">
                     OK
                 </button>
-                <div class="loader-container" v-if="paymentStore.loading.value">
+                <stripe-checkout v-if="!paymentStore.loading.value" ref="checkoutSubRef" :pk="paymentStore.publishableKey"
+                    :sessionId="paymentStore.sessionSubId.value" />
+                <!-- <div class="loader-container" v-if="paymentStore.loading.value">
                     <Loader class="loader" />
-                </div>
-                <div v-else>
-                    <stripe-checkout ref="checkoutSubRef" :pk="paymentStore.publishableKey"
-                        :sessionId="paymentStore.sessionSubId.value" />
-                    <button class="btn btn-primary" @click="submit">Subscribe</button>
-                </div>
+                </div> -->
+                <button class="btn btn-primary" @click="submit">Subscribe</button>
             </div>
         </div>
     </div>
@@ -24,7 +22,7 @@ import { StripeCheckout } from '@vue-stripe/vue-stripe';
 import { useCurrencyStore } from '../stores/CurrencyStore';
 import { usePaymentStore } from '../stores/PaymentStore';
 import { ref } from 'vue';
-import Loader from '../components/LoaderMini.vue';
+// import Loader from '../components/LoaderMini.vue';
 
 const currencyStore = useCurrencyStore();
 
@@ -32,9 +30,11 @@ const modalMessage = ref('Consider upgrading to a premium subscription to track 
 const showOKButton = ref(true);
 
 const paymentStore = usePaymentStore();
+
 const checkoutSubRef = ref(null);
 
-const submit = () => {
+const submit = async () => {
+    await paymentStore.getSession();
     if (checkoutSubRef.value) {
         checkoutSubRef.value.redirectToCheckout();
     } else {
@@ -44,7 +44,7 @@ const submit = () => {
 
 const closeModal = () => {
     try {
-    currencyStore.showPremiumModal = false;
+        currencyStore.showPremiumModal = false;
     } catch (e) {
         if (e instanceof Stripe.CardException) {
             console.error("A payment error occurred: " + e.getError().message);

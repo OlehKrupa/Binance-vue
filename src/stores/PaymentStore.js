@@ -15,6 +15,7 @@ export function usePaymentStore() {
     try {
       const res = await getPaymentSession();
       sessionSubId.value = res.data.sub.id;
+      console.log("Stripe: " + sessionSubId.value);
     } catch (err) {
       console.log(err);
     } finally {
@@ -27,12 +28,11 @@ export function usePaymentStore() {
     authStore.fetchUser();
   }
 
-  getSession();
-
   return {
     sessionSubId,
     publishableKey,
     loading,
     handleCancelPremium,
+    getSession,
   };
 }
