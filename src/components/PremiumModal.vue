@@ -6,9 +6,14 @@
                 <button v-if="showOKButton" @click="closeModal" class="btn btn-success mr-2">
                     OK
                 </button>
-                <router-link v-if="showPaymentButton" :to="{ name: 'payment' }" class="btn btn-warning">
-                    Go to Payment
-                </router-link>
+                <div class="loader-container" v-if="paymentStore.loading.value">
+                    <Loader class="loader" />
+                </div>
+                <div v-else>
+                    <stripe-checkout ref="checkoutSubRef" :pk="paymentStore.publishableKey"
+                        :sessionId="paymentStore.sessionSubId.value" />
+                    <button class="btn btn-primary" @click="submit">Subscribe</button>
+                </div>
             </div>
         </div>
     </div>
@@ -17,23 +22,28 @@
 <script setup>
 import { useCurrencyStore } from '../stores/CurrencyStore';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import Loader from '../components/LoaderMini.vue';
+import { StripeCheckout } from '@vue-stripe/vue-stripe';
+import { usePaymentStore } from '../stores/PaymentStore';
 
 const currencyStore = useCurrencyStore();
-const router = useRouter();
 
-const modalMessage = ref('');
+const modalMessage = ref('Consider upgrading to a premium subscription to track more cryptocurrencies.');
 const showOKButton = ref(true);
-const showPaymentButton = ref(false);
 
-modalMessage.value = 'Consider upgrading to a premium subscription to track more cryptocurrencies.';
-showOKButton.value = true;
-showPaymentButton.value = true;
+const paymentStore = usePaymentStore();
+const checkoutSubRef = ref(null);
+
+const submit = () => {
+    console.log(checkoutSubRef.value);
+    if (checkoutSubRef.value) {
+        checkoutSubRef.value.redirectToCheckout();
+    }
+};
 
 const closeModal = () => {
     currencyStore.showPremiumModal = false;
 };
-
 </script>
   
 <style scoped>
@@ -55,4 +65,17 @@ const closeModal = () => {
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+.loader-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.loader {
+    height: 100%;
+    width: 100%;
+}
 </style>
+  
