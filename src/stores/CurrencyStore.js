@@ -15,9 +15,6 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     const sortColumn = ref('orderIndex');
     const sortDirection = ref('asc');
     const searchQuery = ref('');
-    
-    //Заглушка
-    const premium = ref(false);
 
     const showZeroModal = ref(false);
     const showPremiumModal = ref(false);
