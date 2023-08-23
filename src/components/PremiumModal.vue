@@ -20,11 +20,11 @@
 </template>
   
 <script setup>
+import { StripeCheckout } from '@vue-stripe/vue-stripe';
 import { useCurrencyStore } from '../stores/CurrencyStore';
+import { usePaymentStore } from '../stores/PaymentStore';
 import { ref } from 'vue';
 import Loader from '../components/LoaderMini.vue';
-import { StripeCheckout } from '@vue-stripe/vue-stripe';
-import { usePaymentStore } from '../stores/PaymentStore';
 
 const currencyStore = useCurrencyStore();
 
@@ -37,11 +37,23 @@ const checkoutSubRef = ref(null);
 const submit = () => {
     if (checkoutSubRef.value) {
         checkoutSubRef.value.redirectToCheckout();
+    } else {
+        console.error('checkoutSubRef is not available.');
     }
 };
 
 const closeModal = () => {
+    try {
     currencyStore.showPremiumModal = false;
+    } catch (e) {
+        if (e instanceof Stripe.CardException) {
+            console.error("A payment error occurred: " + e.getError().message);
+        } else if (e instanceof Stripe.InvalidRequestException) {
+            console.error("An invalid request occurred.");
+        } else {
+            console.error("Another problem occurred, maybe unrelated to Stripe.");
+        }
+    }
 };
 </script>
   
