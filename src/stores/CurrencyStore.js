@@ -28,8 +28,6 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
         }
     }
 
-
-
     const selectedCurrencyIdOnLocalStorage = localStorage.getItem('selectedId');
     if (selectedCurrencyIdOnLocalStorage) {
         selectedCurrencyId.value = parseInt(selectedCurrencyIdOnLocalStorage);
@@ -98,9 +96,9 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
                 }
                 if ((preferences.value.length >= 4) && (authStore.isPremium === null)) {
                     const elementsToRemove = preferences.value.length - 4;
-    if (elementsToRemove > 0) {
-        preferences.value.splice(preferences.value.length - elementsToRemove, elementsToRemove);
-    }
+                    if (elementsToRemove > 0) {
+                        preferences.value.splice(preferences.value.length - elementsToRemove, elementsToRemove);
+                    }
                     showPremiumModal.value = true;
                 } else {
                     preferences.value.push(currencyId);
