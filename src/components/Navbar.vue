@@ -46,7 +46,7 @@
                   </a>
                 </li>
                 <li v-if="store.isPremium">
-                  <a href="#" class="dropdown-item" @click.prevent="store.handleCancelPremium">Unpremium</a>
+                  <a href="#" class="dropdown-item" @click.prevent="store.handleCancelPremium">Cancel subscription</a>
                 </li>
               </ul>
             </li>
