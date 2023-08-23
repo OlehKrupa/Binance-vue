@@ -15,15 +15,9 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     const sortColumn = ref('orderIndex');
     const sortDirection = ref('asc');
     const searchQuery = ref('');
-    
-    //Заглушка
-    const premium = ref(false);
 
     const showZeroModal = ref(false);
     const showPremiumModal = ref(false);
-
-    //1 minute
-    const fetchInterval = 1 * 60 * 1000;
 
     const manualFetchData = async () => {
         if (currenciesData.value.length === 0) {
@@ -32,11 +26,6 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
         if (preferences.value.length === 0) {
             await fetchPreferences();
         }
-    }
-
-    const fetchData = async () => {
-        await fetchCurrencies();
-        await fetchPreferences();
     }
 
     const selectedCurrencyIdOnLocalStorage = localStorage.getItem('selectedId');
@@ -90,7 +79,7 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             if (preferences.value.length > 0) {
                 selectedCurrencyId.value = preferences.value[0];
             } else {
-                showZeroModal.value=true;
+                showZeroModal.value = true;
             }
         } catch (error) {
             console.error('Error', error);
@@ -102,18 +91,22 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
             if (isPreferredCurrency(currencyId)) {
                 preferences.value = preferences.value.filter((pref) => pref !== currencyId);
             } else {
-                if (authStore.isPremium!=null) {
+                if (authStore.isPremium != null) {
                     preferences.value.push(currencyId);
                 }
-                if ((preferences.value.length >= 4) && (authStore.isPremium===null)) {
-                    showPremiumModal.value=true;
+                if ((preferences.value.length >= 4) && (authStore.isPremium === null)) {
+                    const elementsToRemove = preferences.value.length - 4;
+                    if (elementsToRemove > 0) {
+                        preferences.value.splice(preferences.value.length - elementsToRemove, elementsToRemove);
+                    }
+                    showPremiumModal.value = true;
                 } else {
                     preferences.value.push(currencyId);
                 }
             }
             const selectedCurrencies = preferences.value;
-            if (selectedCurrencies.length === 0){
-                showZeroModal.value=true;
+            if (selectedCurrencies.length === 0) {
+                showZeroModal.value = true;
             }
             await userPreferencesUpdate({ selectedCurrencies });
         } catch (error) {
@@ -161,7 +154,14 @@ export const useCurrencyStore = defineStore('currencyStore', () => {
     );
 
     manualFetchData();
+    //1 minute
+    //const fetchInterval = 1 * 60 * 1000;
     //setInterval(fetchData, fetchInterval);
+
+    // const fetchData = async () => {
+    //     await fetchCurrencies();
+    //     await fetchPreferences();
+    // }
 
     return {
         loader,

@@ -3,18 +3,25 @@ import { computed, ref } from "vue";
 import { csrfCookie, login, register, logout, getUser } from "../http/auth-api";
 
 export const useAuthStore = defineStore("authStore", () => {
+  var millisecondsPerDay = 24 * 60 * 60 * 1000;
+
   const user = ref(null);
   const errors = ref({});
 
   const isSubscribed = computed(() => user.value && user.value.subscribed_at);
   const isPremium = computed(() => user.value && user.value.premium_at);
-
   const isLoggedIn = computed(() => !!user.value);
 
   const fetchUser = async () => {
     try {
       const { data } = await getUser();
       user.value = data;
+      //Premium expire
+      var daysDiff = Math.floor(Math.abs(new Date(user.value.premium_at) - new Date(Date.now())) / millisecondsPerDay)
+      if (daysDiff >= 32) {
+        //Premium expire
+        user.value.premium_at = null;
+      }
     } catch (error) {
       user.value = null;
     }

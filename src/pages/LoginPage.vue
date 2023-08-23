@@ -44,6 +44,7 @@ const form = reactive({
 
 const handleSubmit = async () => {
     await handleLogin(form)
+    console.log(isLoggedIn.value);
     if (isLoggedIn.value) {
         router.push({ name: 'dashboard' })
     }
