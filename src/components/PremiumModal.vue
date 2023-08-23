@@ -35,7 +35,6 @@ const paymentStore = usePaymentStore();
 const checkoutSubRef = ref(null);
 
 const submit = () => {
-    console.log(checkoutSubRef.value);
     if (checkoutSubRef.value) {
         checkoutSubRef.value.redirectToCheckout();
     }
