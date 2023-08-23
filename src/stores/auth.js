@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { csrfCookie, login, register, logout, getUser } from "../http/auth-api";
-import { unPremium } from "../http/user-api";
+import { unPremium, unStripe } from "../http/user-api";
 
 export const useAuthStore = defineStore("authStore", () => {
-  const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  var millisecondsPerDay = 24 * 60 * 60 * 1000;
   
   const user = ref(null);
   const errors = ref({});
@@ -19,9 +19,8 @@ export const useAuthStore = defineStore("authStore", () => {
       const { data } = await getUser();
       user.value = data;
       //Premium expire
-      var millisecondsPerDay = 24 * 60 * 60 * 1000;
       var daysDiff = Math.floor(Math.abs(new Date(user.value.premium_at) - new Date(Date.now())) / millisecondsPerDay)
-      if (daysDiff >= 31) {
+      if (daysDiff >= 32) {
         unPremium();
       }
     } catch (error) {
@@ -30,13 +29,8 @@ export const useAuthStore = defineStore("authStore", () => {
   };
 
   const handleCancelPremium = async () => {
-    await deleteUserFromStripe(user.value.email);
-    unPremium();
+    unStripe();
     fetchUser();
-  }
-
-  const deleteUserFromStripe = async (email) => {
-
   }
 
   const handleLogin = async (credentials) => {
