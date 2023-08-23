@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { csrfCookie, login, register, logout, getUser } from "../http/auth-api";
-import { unStripe } from "../http/user-api";
 
 export const useAuthStore = defineStore("authStore", () => {
   var millisecondsPerDay = 24 * 60 * 60 * 1000;
@@ -20,18 +19,13 @@ export const useAuthStore = defineStore("authStore", () => {
       //Premium expire
       var daysDiff = Math.floor(Math.abs(new Date(user.value.premium_at) - new Date(Date.now())) / millisecondsPerDay)
       if (daysDiff >= 32) {
-        isPremium = false;
+        //Premium expire
+        user.value.premium_at = null;
       }
-      //Premium expire
     } catch (error) {
       user.value = null;
     }
   };
-
-  const handleCancelPremium = async () => {
-    unStripe();
-    fetchUser();
-  }
 
   const handleLogin = async (credentials) => {
     await csrfCookie();
@@ -73,7 +67,6 @@ export const useAuthStore = defineStore("authStore", () => {
     isSubscribed,
     isPremium,
     fetchUser,
-    handleCancelPremium,
     handleLogin,
     handleRegister,
     handleLogout,
